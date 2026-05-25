@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Excel Académico con Formato Profesional</title>
-    <script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <title>Generador de Excel Académico con Gráfico</title>
+    <script src="https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
@@ -118,8 +118,8 @@
 <body>
     <header class="app-header">
         <div>
-            <h1>📐 Generador de Excel Académico (Formato Profesional)</h1>
-            <div style="font-size:0.8rem;opacity:0.85;">Configurá tu materia y descargá el libro con diseño corporativo</div>
+            <h1>📐 Generador de Excel Académico (con gráfico)</h1>
+            <div style="font-size:0.8rem;opacity:0.85;">Configurá tu materia y descargá el libro con diseño profesional</div>
         </div>
         <div>
             <button class="btn btn-upload" onclick="document.getElementById('pdfUpload').click()">📄 Importar Rúbrica desde PDF</button>
@@ -416,74 +416,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // ==================== GENERACIÓN DE EXCEL CON FORMATO PROFESIONAL ====================
-        const AZUL_OSCURO = '002060';
-        const GRIS_CLARO = 'C8C8C8';
-        const GRIS_MUY_CLARO = 'E6E6E6';
-        const BLANCO = 'FFFFFF';
-        const AMARILLO_CLARO = 'FFFFCC';
-
-        function estiloCelda(tipo) {
-            const base = {
-                font: { name: 'Calibri', sz: 11, bold: false, color: { rgb: '000000' } },
-                fill: { fgColor: { rgb: BLANCO } },
-                alignment: { vertical: 'center', horizontal: 'center', wrapText: false },
-                border: {
-                    top: { style: 'thin', color: { rgb: '000000' } },
-                    bottom: { style: 'thin', color: { rgb: '000000' } },
-                    left: { style: 'thin', color: { rgb: '000000' } },
-                    right: { style: 'thin', color: { rgb: '000000' } }
-                }
-            };
-            switch (tipo) {
-                case 'titulo':
-                    base.font = { name: 'Calibri', sz: 14, bold: true, color: { rgb: 'FFFFFF' } };
-                    base.fill = { fgColor: { rgb: AZUL_OSCURO } };
-                    base.alignment.horizontal = 'center';
-                    break;
-                case 'subtitulo':
-                    base.font = { name: 'Calibri', sz: 11, bold: true, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: GRIS_CLARO } };
-                    break;
-                case 'cabecera':
-                    base.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: GRIS_MUY_CLARO } };
-                    break;
-                case 'dato':
-                    base.font = { name: 'Calibri', sz: 10, bold: false, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: BLANCO } };
-                    break;
-                case 'dato_alt':
-                    base.font = { name: 'Calibri', sz: 10, bold: false, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: 'F9FAFB' } };
-                    break;
-                case 'metrica_label':
-                    base.font = { name: 'Calibri', sz: 12, bold: true, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: GRIS_CLARO } };
-                    break;
-                case 'nota_final':
-                    base.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '000000' } };
-                    base.fill = { fgColor: { rgb: AMARILLO_CLARO } };
-                    break;
-                default: break;
-            }
-            return JSON.parse(JSON.stringify(base));
-        }
-
-        function aplicarEstilo(ws, celda, tipo, valor) {
-            if (!ws[celda]) ws[celda] = { v: '' };
-            ws[celda].s = estiloCelda(tipo);
-            if (typeof valor === 'number' && !isNaN(valor)) {
-                ws[celda].t = 'n'; ws[celda].v = valor;
-                ws[celda].s.numFmt = '0.0';
-            } else if (valor && typeof valor === 'object' && valor.f) {
-                ws[celda].t = 'n'; ws[celda].f = valor.f;
-                ws[celda].s.numFmt = '0.0';
-            } else {
-                ws[celda].v = valor || '';
-            }
-        }
-
+        // ==================== GENERACIÓN DE EXCEL CON EXCELJS ====================
         function descargarExcel() {
             actualizarAlumnos();
             if (fechas.length === 0) { alert('Primero generá el cronograma de fechas.'); return; }
@@ -498,207 +431,205 @@
             const totalEvals = evalsE1 + evalsE2;
             const totalTPs = tpsE1 + tpsE2;
             const colsPorEval = 1 + recups;
-            const wb = XLSX.utils.book_new();
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'Generador Académico';
+
+            // Estilos reutilizables
+            const titulo = { font: { name: 'Calibri', size: 14, bold: true, color: { argb: 'FFFFFFFF' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002060' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
+            const subtitulo = { font: { name: 'Calibri', size: 11, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8C8C8' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
+            const cabecera = { font: { name: 'Calibri', size: 10, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6E6E6' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
+            const dato = { font: { name: 'Calibri', size: 10 }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
+            const notaFinalStyle = { font: { name: 'Calibri', size: 10, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFCC' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
+            const datoLeft = { ...dato, alignment: { vertical: 'middle', horizontal: 'left' } };
 
             // ---------- DASHBOARD ----------
-            const dashData = [
-                ['SEGUIMIENTO ACADÉMICO', '', ''],
+            const wsDash = wb.addWorksheet('Dashboard');
+            wsDash.mergeCells('A1:C1');
+            const titleRow = wsDash.getRow(1); titleRow.height = 35;
+            titleRow.getCell(1).value = 'SEGUIMIENTO ACADÉMICO'; titleRow.getCell(1).style = titulo;
+            for (let c = 2; c <= 3; c++) titleRow.getCell(c).style = { ...titulo, font: { ...titulo.font, size: 14 } };
+            // Metadatos
+            const meta = [
                 ['Asignatura:', document.getElementById('asignatura').value, ''],
                 ['Curso:', document.getElementById('curso').value, ''],
                 ['Docente:', document.getElementById('docente').value, ''],
                 ['Régimen:', document.getElementById('regimen').value, ''],
                 ['Año:', document.getElementById('anio').value, ''],
                 ['Nota mínima:', notaMin, ''],
-                ['Asistencia mínima:', asistMin + '%', ''],
-                ['', '', ''],
-                ['Métrica de Gestión', 'Valor Actual', ''],
-                ['Total de Alumnos', alumnos.length, ''],
-                ['Promedio General del Curso', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}, ''],
-                ['Asistencia Promedio del Ciclo', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}, ''],
-                ['', '', ''],
-                ['Estado / Condición Final', 'Cantidad Alumnos', ''],
-                ['Aprobado', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Aprobado")`}, ''],
-                ['Libre por Nota', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Nota")`}, ''],
-                ['Libre por Asistencia', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Asistencia")`}, '']
+                ['Asistencia mínima:', asistMin + '%', '']
             ];
-            const wsDash = XLSX.utils.aoa_to_sheet(dashData);
-            wsDash['!merges'] = [{s:{r:0,c:0},e:{r:0,c:2}}];
-            for (let R = 0; R < dashData.length; R++) {
-                for (let C = 0; C < dashData[R].length; C++) {
-                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    let tipo = 'dato';
-                    if (R === 0) tipo = 'titulo';
-                    else if (R === 9 || R === 14) tipo = 'metrica_label';
-                    aplicarEstilo(wsDash, cellRef, tipo, dashData[R][C]);
-                }
-            }
-            wsDash['!cols'] = [{wch:30}, {wch:20}, {wch:10}];
-            wsDash['!rows'] = [{hpx:35}, {hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:5},{hpx:25},{hpx:20},{hpx:20},{hpx:20},{hpx:5},{hpx:25},{hpx:20},{hpx:20},{hpx:20}];
-            XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
+            meta.forEach((rowData, i) => {
+                const row = wsDash.getRow(i+3);
+                rowData.forEach((val, j) => {
+                    const cell = row.getCell(j+1);
+                    if (j === 0) { cell.style = { ...dato, font: { bold: true } }; cell.value = val; }
+                    else { cell.style = dato; cell.value = val; }
+                });
+            });
+            wsDash.getRow(10).getCell(1).value = 'Métrica de Gestión'; wsDash.getRow(10).getCell(1).style = subtitulo;
+            wsDash.getRow(10).getCell(2).value = 'Valor Actual'; wsDash.getRow(10).getCell(2).style = subtitulo;
+            wsDash.getRow(11).getCell(1).value = 'Total de Alumnos'; wsDash.getRow(11).getCell(2).value = alumnos.length;
+            wsDash.getRow(12).getCell(1).value = 'Promedio General del Curso';
+            wsDash.getRow(12).getCell(2).value = { formula: `PROMEDIO(Notas!${colLetter(3+totalEvals*colsPorEval)}6:${colLetter(3+totalEvals*colsPorEval)}${5+alumnos.length})` };
+            wsDash.getRow(13).getCell(1).value = 'Asistencia Promedio del Ciclo';
+            wsDash.getRow(13).getCell(2).value = { formula: `PROMEDIO(Asistencia!${colLetter(3+fechas.length)}6:${colLetter(3+fechas.length)}${5+alumnos.length})` };
+            wsDash.getRow(15).getCell(1).value = 'Estado / Condición Final'; wsDash.getRow(15).getCell(1).style = subtitulo;
+            wsDash.getRow(15).getCell(2).value = 'Cantidad Alumnos'; wsDash.getRow(15).getCell(2).style = subtitulo;
+            const colEstado = 4 + totalEvals*colsPorEval;
+            wsDash.getRow(16).getCell(1).value = 'Aprobado';
+            wsDash.getRow(16).getCell(2).value = { formula: `CONTAR.SI(Notas!${colLetter(colEstado)}6:${colLetter(colEstado)}${5+alumnos.length};"Aprobado")` };
+            wsDash.getRow(17).getCell(1).value = 'Libre por Nota';
+            wsDash.getRow(17).getCell(2).value = { formula: `CONTAR.SI(Notas!${colLetter(colEstado)}6:${colLetter(colEstado)}${5+alumnos.length};"Libre por Nota")` };
+            wsDash.getRow(18).getCell(1).value = 'Libre por Asistencia';
+            wsDash.getRow(18).getCell(2).value = { formula: `CONTAR.SI(Notas!${colLetter(colEstado)}6:${colLetter(colEstado)}${5+alumnos.length};"Libre por Asistencia")` };
+            for (let r = 3; r <= 18; r++) for (let c = 1; c <= 3; c++) wsDash.getRow(r).getCell(c).style = (r >= 11 && r <= 13 || r >= 16) ? dato : (r === 10 || r === 15) ? subtitulo : (c === 1 ? { ...dato, font: { bold: true } } : dato);
+            wsDash.columns = [{ width: 30 }, { width: 20 }, { width: 10 }];
+
+            // Agregar gráfico de barras en Dashboard
+            wsDash.getRow(20).getCell(1).value = 'Distribución de Alumnos por Condición';
+            wsDash.getRow(20).getCell(1).style = { font: { bold: true, size: 12 } };
+            // Datos para el gráfico: usar las celdas de los conteos (B16:B18) y las etiquetas (A16:A18)
+            const chart = wsDash.addChart('bar', 'columnaAgrupada', 'Gráfico de Condiciones', 'A20', 'F35');
+            chart.title = 'Distribución de Alumnos por Condición';
+            chart.xAxis = 'Condición';
+            chart.yAxis = 'Cantidad';
+            chart.dataLabels = { showValue: true };
+            chart.series = [{
+                name: 'Cantidad',
+                categories: 'Dashboard!A16:A18',
+                values: 'Dashboard!B16:B18'
+            }];
+            // Ajustar colores
+            chart.series[0].fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
 
             // ---------- ASISTENCIA ----------
-            const ultColAsis = 3 + fechas.length;
-            const colLetraUltAsis = XLSX.utils.encode_col(ultColAsis);
-            const wsAsis = {};
-            wsAsis['A1'] = { v: 'REGISTRO ANUAL DE ASISTENCIA', s: estiloCelda('titulo') };
-            wsAsis['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
-            wsAsis[`D3`] = { v: 'REGISTRO DE ASISTENCIA DIARIA', s: estiloCelda('subtitulo') };
-            wsAsis[`${colLetraUltAsis}3`] = { v: 'MÉTRICA', s: estiloCelda('subtitulo') };
-            const asisCab = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
-            asisCab.forEach((h, idx) => {
-                wsAsis[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
-            });
+            const wsAsis = wb.addWorksheet('Asistencia');
+            wsAsis.mergeCells(1, 1, 1, 3+fechas.length);
+            wsAsis.getRow(1).getCell(1).value = 'REGISTRO ANUAL DE ASISTENCIA'; wsAsis.getRow(1).getCell(1).style = titulo;
+            wsAsis.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsAsis.mergeCells(3, 1, 3, 3);
+            wsAsis.getRow(3).getCell(4).value = 'REGISTRO DE ASISTENCIA DIARIA'; wsAsis.mergeCells(3, 4, 3, 3+fechas.length);
+            wsAsis.getRow(3).getCell(4+fechas.length).value = 'MÉTRICA';
+            for (let c = 1; c <= 3+fechas.length; c++) wsAsis.getRow(3).getCell(c).style = subtitulo;
+            const cabAsis = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
+            const rowCabAsis = wsAsis.getRow(4);
+            cabAsis.forEach((h, i) => { rowCabAsis.getCell(i+1).value = h; rowCabAsis.getCell(i+1).style = cabecera; });
             for (let i = 0; i < alumnos.length; i++) {
-                const filaExcel = i + 5;
-                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
-                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
-                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
-                for (let j = 0; j < fechas.length; j++) {
-                    wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
-                }
-                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:ultColAsis})] = {
-                    f: `SI(CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})>0${sep}CONTAR.SI(D${filaExcel}:${colLetraUltAsis}${filaExcel}${sep}"P")/CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})${sep}0)`,
-                    t: 'n', s: { ...estiloCelda('dato'), numFmt: '0%' }
-                };
+                const row = wsAsis.getRow(i+5);
+                row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
+                row.getCell(3).style = datoLeft;
+                for (let j = 0; j < fechas.length; j++) row.getCell(4+j).value = '';
+                const ultCol = 4+fechas.length;
+                row.getCell(ultCol).value = { formula: `SI(CONTARA(D${i+5}:${colLetter(ultCol-1)}${i+5})>0${sep}CONTAR.SI(D${i+5}:${colLetter(ultCol-1)}${i+5}${sep}"P")/CONTARA(D${i+5}:${colLetter(ultCol-1)}${i+5})${sep}0)` };
+                row.getCell(ultCol).numFmt = '0%';
+                for (let c = 1; c <= ultCol; c++) row.getCell(c).style = (c === 3) ? datoLeft : dato;
             }
-            wsAsis['!merges'] = [
-                {s:{r:0,c:0}, e:{r:0,c:ultColAsis}},
-                {s:{r:2,c:0}, e:{r:2,c:2}},
-                {s:{r:2,c:3}, e:{r:2,c:ultColAsis-1}},
-                {s:{r:2,c:ultColAsis}, e:{r:2,c:ultColAsis}}
-            ];
-            wsAsis['!cols'] = [{wch:5},{wch:12},{wch:30}, ...fechas.map(() => ({wch:5})), {wch:10}];
-            wsAsis['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:22}];
-            for (let i=0; i<alumnos.length; i++) wsAsis['!rows'].push({hpx:15});
-            wsAsis['!freeze'] = { xSplit: 3, ySplit: 4 };
-            wsAsis['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:4+alumnos.length-1, c:ultColAsis}});
-            XLSX.utils.book_append_sheet(wb, wsAsis, "Asistencia");
+            wsAsis.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...fechas.map(() => ({ width: 5 })), { width: 10 }];
+            wsAsis.views = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
 
             // ---------- TRABAJOS PRÁCTICOS ----------
-            const ultColTPs = 3 + totalTPs;
-            const colLetraUltTP = XLSX.utils.encode_col(ultColTPs);
-            const wsTPs = {};
-            wsTPs['A1'] = { v: 'SEGUIMIENTO DE TRABAJOS PRÁCTICOS', s: estiloCelda('titulo') };
-            wsTPs['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
-            if (tpsE1 > 0) wsTPs[`D3`] = { v: `ETAPA 1 (TP 1 - TP ${tpsE1})`, s: estiloCelda('subtitulo') };
-            if (tpsE2 > 0) wsTPs[`${XLSX.utils.encode_col(3+tpsE1)}3`] = { v: `ETAPA 2 (TP ${tpsE1+1} - TP ${totalTPs})`, s: estiloCelda('subtitulo') };
-            wsTPs[`${colLetraUltTP}3`] = { v: 'PROMEDIO', s: estiloCelda('subtitulo') };
-            const tpsCab = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
-            tpsCab.forEach((h, idx) => {
-                wsTPs[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
-            });
+            const wsTPs = wb.addWorksheet('Trabajos Prácticos');
+            wsTPs.mergeCells(1, 1, 1, 3+totalTPs);
+            wsTPs.getRow(1).getCell(1).value = 'SEGUIMIENTO DE TRABAJOS PRÁCTICOS'; wsTPs.getRow(1).getCell(1).style = titulo;
+            wsTPs.mergeCells(3, 1, 3, 3);
+            wsTPs.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsTPs.getRow(3).getCell(1).style = subtitulo;
+            if (tpsE1 > 0) { wsTPs.mergeCells(3, 4, 3, 4+tpsE1-1); wsTPs.getRow(3).getCell(4).value = `ETAPA 1 (TP 1 - TP ${tpsE1})`; }
+            if (tpsE2 > 0) { wsTPs.mergeCells(3, 4+tpsE1, 3, 4+totalTPs-1); wsTPs.getRow(3).getCell(4+tpsE1).value = `ETAPA 2 (TP ${tpsE1+1} - TP ${totalTPs})`; }
+            wsTPs.mergeCells(3, 4+totalTPs, 3, 4+totalTPs);
+            wsTPs.getRow(3).getCell(4+totalTPs).value = 'PROMEDIO'; wsTPs.getRow(3).getCell(4+totalTPs).style = subtitulo;
+            const cabTPs = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
+            const rowCabTPs = wsTPs.getRow(4);
+            cabTPs.forEach((h, i) => { rowCabTPs.getCell(i+1).value = h; rowCabTPs.getCell(i+1).style = cabecera; });
             for (let i = 0; i < alumnos.length; i++) {
-                const fila = i + 5;
-                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
-                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
-                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
-                for (let j = 0; j < totalTPs; j++) {
-                    wsTPs[XLSX.utils.encode_cell({r:fila-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
-                }
-                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:ultColTPs})] = { f: `PROMEDIO(D${fila}:${colLetraUltTP}${fila})`, t: 'n', s: { ...estiloCelda('dato'), numFmt: '0.0' } };
+                const row = wsTPs.getRow(i+5);
+                row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
+                row.getCell(3).style = datoLeft;
+                for (let j = 0; j < totalTPs; j++) row.getCell(4+j).value = '';
+                row.getCell(4+totalTPs).value = { formula: `PROMEDIO(D${i+5}:${colLetter(4+totalTPs-1)}${i+5})`, numFmt: '0.0' };
+                for (let c = 1; c <= 4+totalTPs; c++) row.getCell(c).style = (c === 3) ? datoLeft : dato;
             }
-            wsTPs['!merges'] = [
-                {s:{r:0,c:0}, e:{r:0,c:ultColTPs}},
-                {s:{r:2,c:0}, e:{r:2,c:2}}
-            ];
-            if (tpsE1 > 0) wsTPs['!merges'].push({s:{r:2,c:3}, e:{r:2,c:3+tpsE1-1}});
-            if (tpsE2 > 0) wsTPs['!merges'].push({s:{r:2,c:3+tpsE1}, e:{r:2,c:3+totalTPs-1}});
-            wsTPs['!merges'].push({s:{r:2,c:ultColTPs}, e:{r:2,c:ultColTPs}});
-            wsTPs['!cols'] = [{wch:5},{wch:12},{wch:30}, ...Array(totalTPs).fill({wch:6}), {wch:10}];
-            wsTPs['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:22}];
-            for (let i=0; i<alumnos.length; i++) wsTPs['!rows'].push({hpx:15});
-            wsTPs['!freeze'] = { xSplit: 3, ySplit: 4 };
-            wsTPs['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:4+alumnos.length-1, c:ultColTPs}});
-            XLSX.utils.book_append_sheet(wb, wsTPs, "Trabajos Prácticos");
+            wsTPs.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...Array(totalTPs).fill({ width: 6 }), { width: 10 }];
+            wsTPs.views = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
 
             // ---------- NOTAS ----------
-            const colNotaFinal = 3 + totalEvals * colsPorEval;
-            const colEstado = colNotaFinal + 1;
-            const colLetraNF = XLSX.utils.encode_col(colNotaFinal);
-            const colLetraEst = XLSX.utils.encode_col(colEstado);
-            const wsNotas = {};
-            wsNotas['A1'] = { v: 'CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES', s: estiloCelda('titulo') };
-            wsNotas['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
-            if (evalsE1 > 0) wsNotas[`D3`] = { v: 'EVALUACIONES - ETAPA 1', s: estiloCelda('subtitulo') };
-            if (evalsE2 > 0) wsNotas[`${XLSX.utils.encode_col(3+evalsE1*colsPorEval)}3`] = { v: 'EVALUACIONES - ETAPA 2', s: estiloCelda('subtitulo') };
-            wsNotas[`${colLetraNF}3`] = { v: 'RESULTADOS FINALES', s: estiloCelda('subtitulo') };
-            const cabNotas = ['Nº', 'DNI', 'Apellido y Nombre'];
-            for (let e=1; e<=totalEvals; e++) cabNotas.push(`Ev${e}`, ...Array(recups).fill(''));
-            cabNotas.push('Nota Final', 'Estado Académico');
+            const wsNotas = wb.addWorksheet('Notas');
+            wsNotas.mergeCells(1, 1, 1, 3+totalEvals*colsPorEval+1);
+            wsNotas.getRow(1).getCell(1).value = 'CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES'; wsNotas.getRow(1).getCell(1).style = titulo;
+            wsNotas.mergeCells(3, 1, 3, 3);
+            wsNotas.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsNotas.getRow(3).getCell(1).style = subtitulo;
+            if (evalsE1 > 0) { wsNotas.mergeCells(3, 4, 3, 4+evalsE1*colsPorEval-1); wsNotas.getRow(3).getCell(4).value = 'EVALUACIONES - ETAPA 1'; }
+            if (evalsE2 > 0) { wsNotas.mergeCells(3, 4+evalsE1*colsPorEval, 3, 4+totalEvals*colsPorEval-1); wsNotas.getRow(3).getCell(4+evalsE1*colsPorEval).value = 'EVALUACIONES - ETAPA 2'; }
+            wsNotas.mergeCells(3, 4+totalEvals*colsPorEval, 3, 5+totalEvals*colsPorEval);
+            wsNotas.getRow(3).getCell(4+totalEvals*colsPorEval).value = 'RESULTADOS FINALES'; wsNotas.getRow(3).getCell(4+totalEvals*colsPorEval).style = subtitulo;
+            const cabNotas1 = ['Nº', 'DNI', 'Apellido y Nombre'];
+            for (let e=1; e<=totalEvals; e++) cabNotas1.push(`Ev${e}`, ...Array(recups).fill(''));
+            cabNotas1.push('Nota Final', 'Estado');
             const cabNotas2 = ['', '', ''];
             for (let e=1; e<=totalEvals; e++) cabNotas2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
             cabNotas2.push('', '');
-            cabNotas.forEach((h, idx) => wsNotas[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') });
-            cabNotas2.forEach((h, idx) => wsNotas[XLSX.utils.encode_cell({r:4, c:idx})] = { v: h, s: estiloCelda('cabecera') });
+            const rowCabNotas1 = wsNotas.getRow(4); cabNotas1.forEach((h,i) => { rowCabNotas1.getCell(i+1).value = h; rowCabNotas1.getCell(i+1).style = cabecera; });
+            const rowCabNotas2 = wsNotas.getRow(5); cabNotas2.forEach((h,i) => { rowCabNotas2.getCell(i+1).value = h; rowCabNotas2.getCell(i+1).style = cabecera; });
             for (let i = 0; i < alumnos.length; i++) {
-                const fila = i + 6;
-                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
-                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
-                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
-                for (let j=0; j<totalEvals*colsPorEval; j++) {
-                    wsNotas[XLSX.utils.encode_cell({r:fila-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
-                }
-                let formulaNF = '=PROMEDIO(';
-                const partes = [];
-                for (let e=0; e<totalEvals; e++) {
-                    const colIni = 3 + e*colsPorEval;
-                    const colFin = colIni + recups;
-                    partes.push(`MAX(${XLSX.utils.encode_col(colIni)}${fila}:${XLSX.utils.encode_col(colFin)}${fila})`);
-                }
-                formulaNF += partes.join(sep) + ')';
-                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colNotaFinal})] = { f: formulaNF, t: 'n', s: estiloCelda('nota_final') };
-                const colAsisRef = XLSX.utils.encode_col(3+fechas.length);
-                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colEstado})] = {
-                    f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetraNF}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`,
-                    t: 's', s: estiloCelda('dato')
-                };
+                const row = wsNotas.getRow(i+6);
+                row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
+                row.getCell(3).style = datoLeft;
+                for (let j=0; j<totalEvals*colsPorEval; j++) row.getCell(4+j).value = '';
+                const colNF = 4 + totalEvals*colsPorEval;
+                const formulaNF = '=PROMEDIO(' + Array.from({length: totalEvals}, (_, e) => {
+                    const ini = 4 + e*colsPorEval;
+                    return `MAX(${colLetter(ini)}${i+6}:${colLetter(ini+recups)}${i+6})`;
+                }).join(sep) + ')';
+                row.getCell(colNF).value = { formula: formulaNF, numFmt: '0.0' }; row.getCell(colNF).style = notaFinalStyle;
+                row.getCell(colNF+1).value = { formula: `SI(Asistencia!${colLetter(4+fechas.length)}${i+5}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetter(colNF)}${i+6}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))` };
+                for (let c = 1; c <= colNF+1; c++) if (c !== colNF && c !== 3) row.getCell(c).style = dato;
             }
-            wsNotas['!merges'] = [
-                {s:{r:0,c:0}, e:{r:0,c:colEstado}},
-                {s:{r:2,c:0}, e:{r:2,c:2}},
-                {s:{r:2,c:colNotaFinal}, e:{r:2,c:colEstado}},
-                {s:{r:3,c:0}, e:{r:4,c:0}},
-                {s:{r:3,c:1}, e:{r:4,c:1}},
-                {s:{r:3,c:2}, e:{r:4,c:2}},
-                {s:{r:3,c:colNotaFinal}, e:{r:4,c:colNotaFinal}},
-                {s:{r:3,c:colEstado}, e:{r:4,c:colEstado}}
-            ];
-            if (evalsE1 > 0) wsNotas['!merges'].push({s:{r:2,c:3}, e:{r:2,c:3+evalsE1*colsPorEval-1}});
-            if (evalsE2 > 0) wsNotas['!merges'].push({s:{r:2,c:3+evalsE1*colsPorEval}, e:{r:2,c:colNotaFinal-1}});
-            for (let e=0; e<totalEvals; e++) {
-                wsNotas['!merges'].push({s:{r:3,c:3+e*colsPorEval}, e:{r:3,c:3+(e+1)*colsPorEval-1}});
-            }
-            wsNotas['!cols'] = [{wch:5},{wch:12},{wch:30}, ...Array(totalEvals*colsPorEval).fill({wch:6}), {wch:11},{wch:18}];
-            wsNotas['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:30},{hpx:22}];
-            for (let i=0; i<alumnos.length; i++) wsNotas['!rows'].push({hpx:15});
-            wsNotas['!freeze'] = { xSplit: 3, ySplit: 5 };
-            wsNotas['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:5+alumnos.length-1, c:colEstado}});
-            XLSX.utils.book_append_sheet(wb, wsNotas, "Notas");
+            wsNotas.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...Array(totalEvals*colsPorEval).fill({ width: 6 }), { width: 11 }, { width: 18 }];
+            wsNotas.views = [{ state: 'frozen', xSplit: 3, ySplit: 5 }];
+            // Merges adicionales
+            wsNotas.mergeCells(4, 1, 5, 1); wsNotas.mergeCells(4, 2, 5, 2); wsNotas.mergeCells(4, 3, 5, 3);
+            wsNotas.mergeCells(4, colNF, 5, colNF); wsNotas.mergeCells(4, colNF+1, 5, colNF+1);
+            for (let e=0; e<totalEvals; e++) wsNotas.mergeCells(4, 4+e*colsPorEval, 4, 4+(e+1)*colsPorEval-1);
 
             // ---------- RÚBRICA ----------
             actualizarRubricaDesdeTabla();
-            const wsRub = {};
-            wsRub['A1'] = { v: 'MATRIZ DE EVALUACIÓN DE COMPETENCIAS', s: estiloCelda('titulo') };
-            const rubCab = ['Criterio de Evaluación', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'];
-            rubCab.forEach((h, idx) => wsRub[XLSX.utils.encode_cell({r:2, c:idx})] = { v: h, s: estiloCelda('subtitulo') });
+            const wsRub = wb.addWorksheet('Rúbrica');
+            wsRub.mergeCells(1, 1, 1, 5);
+            wsRub.getRow(1).getCell(1).value = 'MATRIZ DE EVALUACIÓN DE COMPETENCIAS'; wsRub.getRow(1).getCell(1).style = titulo;
+            const cabRub = ['Criterio de Evaluación', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'];
+            const rowCabRub = wsRub.getRow(3);
+            cabRub.forEach((h, i) => { rowCabRub.getCell(i+1).value = h; rowCabRub.getCell(i+1).style = subtitulo; });
             rubricaCriterios.forEach((criterio, i) => {
-                criterio.forEach((texto, j) => {
-                    wsRub[XLSX.utils.encode_cell({r:3+i, c:j})] = { v: texto, s: { ...estiloCelda('dato'), alignment: { horizontal: j===0 ? 'left' : 'center', vertical: 'center', wrapText: true } } };
-                });
+                const row = wsRub.getRow(i+4);
+                row.getCell(1).value = criterio[0]; row.getCell(1).style = { ...datoLeft, alignment: { wrapText: true, vertical: 'middle' } };
+                for (let j = 1; j < 5; j++) row.getCell(j+1).value = criterio[j]; row.getCell(j+1).style = { ...dato, alignment: { wrapText: true, vertical: 'middle' } };
             });
-            wsRub['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:4}}];
-            wsRub['!cols'] = [{wch:35},{wch:20},{wch:20},{wch:25},{wch:25}];
-            wsRub['!rows'] = [{hpx:35},{hpx:5},{hpx:25}];
-            for (let i=0; i<rubricaCriterios.length; i++) wsRub['!rows'].push({hpx:45});
-            wsRub['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:3+rubricaCriterios.length-1, c:4}});
-            XLSX.utils.book_append_sheet(wb, wsRub, "Rúbrica");
+            wsRub.columns = [{ width: 35 }, { width: 20 }, { width: 20 }, { width: 25 }, { width: 25 }];
 
-            XLSX.writeFile(wb, `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`);
+            // Descargar
+            wb.xlsx.writeBuffer().then(buffer => {
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function colLetter(index) { // index 1-based
+            let letter = '';
+            while (index > 0) {
+                let mod = (index - 1) % 26;
+                letter = String.fromCharCode(65 + mod) + letter;
+                index = Math.floor((index - 1) / 26);
+            }
+            return letter;
         }
 
         // ==================== GUARDADO Y NAVEGACIÓN ====================
         function guardarEstado() {
-            localStorage.setItem('genAcademico_v3', JSON.stringify({
+            localStorage.setItem('genAcademico_v4', JSON.stringify({
                 alumnos, fechas, rubricaCriterios,
                 asignatura: document.getElementById('asignatura').value,
                 curso: document.getElementById('curso').value,
@@ -722,7 +653,7 @@
         }
 
         function cargarEstado() {
-            const saved = localStorage.getItem('genAcademico_v3');
+            const saved = localStorage.getItem('genAcademico_v4');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('asignatura').value = data.asignatura || 'Asignatura1';
