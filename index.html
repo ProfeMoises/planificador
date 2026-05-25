@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Excel - Seguimiento Académico</title>
-    <!-- SheetJS para generar el Excel -->
+    <title>Generador Dinámico de Libro Excel Académico</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
             --azul-oscuro: #1F4E79;
@@ -45,23 +45,21 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.9rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: 0.2s;
         }
-        .btn-excel {
-            background: #217346;
-            color: white;
-            font-size: 1rem;
-        }
+        .btn-excel { background: #217346; color: white; font-size: 1rem; }
         .btn-excel:hover { background: #185a32; }
+        .btn-upload { background: #4F46E5; color: white; }
+        .btn-upload:hover { background: #4338CA; }
         .tab-nav {
             display: flex;
             background: white;
             border-bottom: 2px solid var(--gris-medio);
             position: sticky;
-            top: 80px;
+            top: 82px;
             z-index: 99;
             overflow-x: auto;
         }
@@ -75,11 +73,7 @@
             border-bottom: 3px solid transparent;
             white-space: nowrap;
         }
-        .tab-btn.active {
-            color: var(--azul-oscuro);
-            border-bottom-color: var(--azul-oscuro);
-            background: #D6E4F0;
-        }
+        .tab-btn.active { color: var(--azul-oscuro); border-bottom-color: var(--azul-oscuro); background: #D6E4F0; }
         .tab-content { display: none; padding: 20px; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -90,100 +84,57 @@
             padding: 20px;
             margin-bottom: 18px;
         }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-        }
-        .meta-item label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #6B7280;
-            display: block;
-            margin-bottom: 3px;
-        }
-        .meta-item input {
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        label { font-size: 0.8rem; font-weight: 600; color: #4B5563; display: block; margin-bottom: 4px; }
+        input, select, textarea {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid #D1D5DB;
             border-radius: 5px;
             font-family: inherit;
+            font-size: 0.9rem;
         }
+        textarea { min-height: 100px; resize: vertical; }
         .table-wrapper {
             overflow-x: auto;
             max-height: 60vh;
             border: 1px solid #D1D5DB;
             border-radius: 8px;
         }
-        table {
-            border-collapse: collapse;
-            width: max-content;
-            min-width: 100%;
-            font-size: 0.8rem;
-        }
-        th, td {
-            padding: 6px 8px;
-            border: 1px solid #D1D5DB;
-            text-align: center;
-            white-space: nowrap;
-        }
-        th {
-            background: var(--azul-oscuro);
-            color: white;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 0.8rem; }
+        th, td { padding: 6px 8px; border: 1px solid #D1D5DB; text-align: center; white-space: nowrap; }
+        th { background: var(--azul-oscuro); color: white; font-weight: 600; position: sticky; top: 0; z-index: 10; }
         .sticky-col { position: sticky; left: 0; z-index: 5; background: inherit; }
         .col-a { left: 0; width: 40px; }
         .col-b { left: 40px; width: 90px; }
         .col-c { left: 130px; width: 200px; text-align: left; }
-        input.cell-input {
-            width: 60px;
-            padding: 4px;
-            border: 1px solid transparent;
-            border-radius: 3px;
-            text-align: center;
-            font-family: inherit;
-            font-size: 0.8rem;
-        }
-        input.cell-input:focus {
-            border-color: #2B6BAE;
-            outline: none;
-            background: white;
-        }
-        .click-cell {
-            cursor: pointer;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
+        input.cell-input { width: 60px; padding: 4px; border: 1px solid transparent; text-align: center; }
+        input.cell-input:focus { border-color: #2B6BAE; outline: none; background: white; }
+        .click-cell { cursor: pointer; padding: 3px 6px; border-radius: 3px; font-weight: 600; }
         .click-cell.P { color: #059669; background: #D1FAE5; }
         .click-cell.A { color: #DC2626; background: #FEE2E2; }
         .click-cell.empty { color: #9CA3AF; }
-        .btn-sm {
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            background: #FEE2E2;
-            color: #DC2626;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+        .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #FEE2E2; color: #DC2626; border: none; border-radius: 4px; cursor: pointer; }
+        .badge { display: inline-block; background: #E0E7FF; color: #3730A3; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+        hr { border: 0.5px solid #E5E7EB; margin: 12px 0; }
     </style>
 </head>
 <body>
     <header class="app-header">
         <div>
-            <h1>📐 Generador de Excel - Seguimiento Académico</h1>
-            <div style="font-size:0.8rem;opacity:0.85;">Lógica Matemática · 4°C · 2026</div>
+            <h1>📐 Generador de Excel Académico (Multi-Asignatura)</h1>
+            <div style="font-size:0.8rem;opacity:0.85;" id="headerSubtitulo">Configurá tu materia y descargá el libro</div>
         </div>
-        <button class="btn btn-excel" onclick="descargarExcel()">📥 Descargar Libro Excel (.xlsx)</button>
+        <div>
+            <button class="btn btn-upload" onclick="document.getElementById('pdfUpload').click()">📄 Importar Rúbrica desde PDF</button>
+            <button class="btn btn-excel" onclick="descargarExcel()">📥 Descargar Libro Excel</button>
+        </div>
+        <input type="file" id="pdfUpload" accept=".pdf" style="display:none" onchange="procesarPDF(this)">
     </header>
 
-    <nav class="tab-nav" id="tabNav">
-        <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="dashboard">⚙️ Configuración General</button>
         <button class="tab-btn" data-tab="asistencia">📋 Asistencia</button>
         <button class="tab-btn" data-tab="tps">📝 Trabajos Prácticos</button>
         <button class="tab-btn" data-tab="notas">🎯 Notas</button>
@@ -191,513 +142,421 @@
     </nav>
 
     <main>
-        <!-- Dashboard -->
+        <!-- ==================== CONFIGURACIÓN ==================== -->
         <section class="tab-content active" id="tab-dashboard">
             <div class="card">
-                <h2>📌 Datos de la Cátedra</h2>
-                <div class="meta-grid">
-                    <div class="meta-item"><label>Asignatura</label><input type="text" id="metaAsignatura" value="Lógica Matemática"></div>
-                    <div class="meta-item"><label>Curso</label><input type="text" id="metaCurso" value="4° C (Turno Mañana)"></div>
-                    <div class="meta-item"><label>Docente</label><input type="text" id="metaDocente" value="Tinte Moisés"></div>
-                    <div class="meta-item"><label>Régimen</label><input type="text" id="metaRegimen" value="Anual (Etapa 1 y Etapa 2)"></div>
-                    <div class="meta-item"><label>Año Lectivo</label><input type="text" id="metaAnio" value="2026"></div>
-                    <div class="meta-item"><label>Nota mínima aprobación</label><input type="number" id="metaNotaMin" value="7.0" step="0.1"></div>
-                    <div class="meta-item"><label>Asistencia mínima (%)</label><input type="number" id="metaAsistMin" value="75" step="1"></div>
-                    <div class="meta-item"><label>Receso Invernal</label><input type="text" id="metaReceso" value="06/07 al 17/07"></div>
+                <h2>📌 Datos Generales de la Cátedra</h2>
+                <div class="grid-3">
+                    <div><label>Asignatura</label><input type="text" id="asignatura" value="Lógica Matemática"></div>
+                    <div><label>Curso / Comisión / Turno</label><input type="text" id="curso" value="4° C (Turno Mañana)"></div>
+                    <div><label>Docente(s)</label><input type="text" id="docente" value="Tinte Moisés"></div>
+                    <div><label>Régimen de Cursada</label><input type="text" id="regimen" value="Anual - Miércoles y Viernes"></div>
+                    <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" value="2026"></div>
+                    <div><label>Receso / Vacaciones</label><input type="text" id="receso" value="06/07 al 17/07"></div>
+                    <div><label>Nota mínima de aprobación</label><input type="number" id="notaMinima" value="7.0" step="0.1"></div>
+                    <div><label>Asistencia mínima (%)</label><input type="number" id="asistenciaMinima" value="75" step="1"></div>
                 </div>
             </div>
             <div class="card">
-                <h2>👥 Nómina de Alumnos (editable)</h2>
-                <div class="table-wrapper" style="max-height:400px;">
-                    <table id="tablaAlumnos">
-                        <thead><tr><th class="sticky-col col-a">Nº</th><th class="sticky-col col-b">DNI</th><th class="sticky-col col-c">Apellido y Nombre</th><th>Acción</th></tr></thead>
-                        <tbody id="tbodyAlumnos"></tbody>
-                    </table>
+                <h2>👥 Nómina de Alumnos</h2>
+                <p style="font-size:0.8rem; color:#6B7280;">Pegá la lista completa (DNI + Nombre, uno por línea). El sistema separa automáticamente.</p>
+                <textarea id="listaAlumnos" placeholder="50696941 ALMIRA CHOQUE, ALUNEY SURYA&#10;50630692 CARGNELUTTI ADET, FABRICCIO JOAQUIN&#10;...">50696941 ALMIRA CHOQUE, ALUNEY SURYA
+50630692 CARGNELUTTI ADET, FABRICCIO JOAQUIN
+50935810 CEPEDA CARDOZO, LUCAS TOBIAS
+50628869 CERESO, PIERINA LIBERTAD
+50947860 CHOQUE, SOFÍA MELANI</textarea>
+                <span class="badge" id="contadorAlumnos">5 alumnos cargados</span>
+            </div>
+            <div class="card">
+                <h2>📅 Cronograma de Fechas de Clase</h2>
+                <p style="font-size:0.8rem; color:#6B7280;">Una fecha por línea (formato DD/MM/AAAA). Se usarán como columnas de asistencia.</p>
+                <textarea id="fechasClase">04/03/2026
+06/03/2026
+11/03/2026
+13/03/2026
+18/03/2026</textarea>
+                <span class="badge" id="contadorFechas">5 fechas</span>
+            </div>
+            <div class="card">
+                <h2>⚙️ Estructura de Evaluaciones y TPs</h2>
+                <div class="grid-2">
+                    <div><label>Nº Evaluaciones Etapa 1</label><input type="number" id="evalsEtapa1" value="4" min="1"></div>
+                    <div><label>Nº Evaluaciones Etapa 2</label><input type="number" id="evalsEtapa2" value="4" min="0"></div>
+                    <div><label>Recuperatorios por Evaluación</label><input type="number" id="recupsPorEval" value="2" min="0"></div>
+                    <div><label>Nº TPs Etapa 1</label><input type="number" id="tpsEtapa1" value="10" min="1"></div>
+                    <div><label>Nº TPs Etapa 2</label><input type="number" id="tpsEtapa2" value="10" min="0"></div>
+                    <div><label>Separador fórmulas</label>
+                        <select id="separadorFormulas">
+                            <option value=";">Punto y coma ( ; )</option>
+                            <option value=",">Coma ( , )</option>
+                        </select>
+                    </div>
                 </div>
-                <button class="btn" style="background:#D6E4F0; color:#1F4E79; margin-top:10px;" onclick="agregarAlumno()">➕ Agregar Alumno</button>
             </div>
         </section>
 
-        <!-- Asistencia -->
+        <!-- ==================== PREVISUALIZACIONES ==================== -->
         <section class="tab-content" id="tab-asistencia">
             <div class="card">
-                <h2>📋 Asistencia (clic para P/A)</h2>
+                <h2>📋 Previsualización de Asistencia</h2>
                 <div class="table-wrapper"><table id="tablaAsistencia"><thead id="theadAsistencia"></thead><tbody id="tbodyAsistencia"></tbody></table></div>
             </div>
         </section>
-
-        <!-- TPs -->
         <section class="tab-content" id="tab-tps">
             <div class="card">
-                <h2>📝 Trabajos Prácticos (20 TP)</h2>
+                <h2>📝 Previsualización de Trabajos Prácticos</h2>
                 <div class="table-wrapper"><table id="tablaTPs"><thead id="theadTPs"></thead><tbody id="tbodyTPs"></tbody></table></div>
             </div>
         </section>
-
-        <!-- Notas -->
         <section class="tab-content" id="tab-notas">
             <div class="card">
-                <h2>🎯 Evaluaciones (8 evaluaciones con 2 recup. cada una)</h2>
+                <h2>🎯 Previsualización de Notas</h2>
                 <div class="table-wrapper"><table id="tablaNotas"><thead id="theadNotas"></thead><tbody id="tbodyNotas"></tbody></table></div>
             </div>
         </section>
-
-        <!-- Rúbrica -->
         <section class="tab-content" id="tab-rubrica">
             <div class="card">
-                <h2>📏 Rúbrica de Evaluación</h2>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>Criterio</th><th>Insuficiente (1-3)</th><th>Regular (4-6)</th><th>Bueno (7-8)</th><th>Excelente (9-10)</th></tr></thead>
-                        <tbody id="tbodyRubrica"></tbody>
-                    </table>
-                </div>
+                <h2>📏 Rúbrica de Evaluación (editable)</h2>
+                <p style="font-size:0.8rem; color:#6B7280;">Hacé clic en las celdas para editar. También podés importar desde PDF.</p>
+                <div class="table-wrapper"><table id="tablaRubrica"><thead><tr><th>Criterio</th><th>Insuficiente (1-3)</th><th>Regular (4-6)</th><th>Bueno (7-8)</th><th>Excelente (9-10)</th></tr></thead><tbody id="tbodyRubrica"></tbody></table></div>
+                <button class="btn" style="background:#D6E4F0; margin-top:10px;" onclick="agregarCriterio()">➕ Agregar criterio</button>
             </div>
         </section>
     </main>
 
-    <canvas id="graficoCanvas" style="display:none;" width="400" height="200"></canvas>
-
     <script>
-        // ==================== DATOS BASE ====================
-        const FECHAS_CLASE = [
-            '04/03/2026','06/03/2026','11/03/2026','13/03/2026','18/03/2026','20/03/2026','25/03/2026','27/03/2026',
-            '01/04/2026','03/04/2026','08/04/2026','10/04/2026','15/04/2026','17/04/2026','22/04/2026','24/04/2026','29/04/2026',
-            '06/05/2026','08/05/2026','13/05/2026','15/05/2026','20/05/2026','22/05/2026','27/05/2026','29/05/2026',
-            '03/06/2026','05/06/2026','10/06/2026','12/06/2026','19/06/2026','24/06/2026','26/06/2026',
-            '01/07/2026','03/07/2026','22/07/2026','24/07/2026','29/07/2026','31/07/2026',
-            '05/08/2026','07/08/2026','12/08/2026','14/08/2026','19/08/2026','21/08/2026','26/08/2026','28/08/2026',
-            '02/09/2026','04/09/2026','09/09/2026','11/09/2026','16/09/2026','18/09/2026','23/09/2026','25/09/2026','30/09/2026',
-            '02/10/2026','07/10/2026','09/10/2026','14/10/2026','16/10/2026','21/10/2026','23/10/2026','28/10/2026','30/10/2026',
-            '04/11/2026','06/11/2026','11/11/2026','13/11/2026','18/11/2026','20/11/2026','25/11/2026','27/11/2026',
-            '02/12/2026','04/12/2026','09/12/2026','11/12/2026','16/12/2026','18/12/2026'
-        ];
-        const ALUMNOS_INICIALES = [
-            {dni:'50696941', nombre:'ALMIRA CHOQUE, ALUNEY SURYA'},
-            {dni:'50630692', nombre:'CARGNELUTTI ADET, FABRICCIO JOAQUIN'},
-            {dni:'50935810', nombre:'CEPEDA CARDOZO, LUCAS TOBIAS'},
-            {dni:'50628869', nombre:'CERESO, PIERINA LIBERTAD'},
-            {dni:'50947860', nombre:'CHOQUE, SOFÍA MELANI'},
-            {dni:'50627865', nombre:'CRUZ REINOSO, NAHUEL IGNACIO'},
-            {dni:'50628299', nombre:'FIGUEROA, JOSHUA MIKHAIL'},
-            {dni:'50591096', nombre:'GIMENEZ AGUIRRE, JUAN ANTONIO'},
-            {dni:'50081017', nombre:'GUERRERO, ISMAEL AARON'},
-            {dni:'50592186', nombre:'LOPEZ, MAICOL ISMAEL'},
-            {dni:'50993165', nombre:'LOPEZ ABAN, LEANDRO URIEL'},
-            {dni:'50996226', nombre:'MAQUERA, SANTINO LUCAS'},
-            {dni:'50627491', nombre:'MARQUEZ ESPINDOLA, THIAGO GASTON'},
-            {dni:'49499068', nombre:'MARTINEZ, MAXIMILIANO GAEL'},
-            {dni:'50743728', nombre:'PAZ HURTADO, AGUSTIN'},
-            {dni:'50630200', nombre:'PERALTA, JEREMIAS LAUTARO'},
-            {dni:'95281284', nombre:'PUITA RENGIFO, DENIS LIMBER'},
-            {dni:'50627579', nombre:'QUIROGA VIGNALE, SANTIAGO GASTON'},
-            {dni:'50938885', nombre:'RIVADERO, ALEJO ALEXIS'},
-            {dni:'50420556', nombre:'RODAS, VALENTINO SEBASTIAN'},
-            {dni:'50421104', nombre:'RODRIGUEZ PONCE, LUCAS HERNAN'},
-            {dni:'50937132', nombre:'RODRIGUEZ VEXENAT, EMMANUEL FERNANDO'},
-            {dni:'50628955', nombre:'ROJAS, GASPAR'},
-            {dni:'50995415', nombre:'SANDOVAL, AZUL KATRINA'},
-            {dni:'50628175', nombre:'SARAVIA GONZALEZ, JULIAN'},
-            {dni:'51298291', nombre:'SUAREZ ABDELNUR, MATEO FRANCISCO'},
-            {dni:'50745908', nombre:'USANDIVARAS, MÍA JAZMIN'},
-            {dni:'50593544', nombre:'VIDELA, FRANCO SEBASTIAN'},
-            {dni:'50837458', nombre:'VILCA, KEVIN LISANDRO'}
-        ];
-
         // ==================== ESTADO GLOBAL ====================
-        let state = {
-            metadatos: {
-                asignatura:'Lógica Matemática', curso:'4° C (Turno Mañana)', docente:'Tinte Moisés',
-                regimen:'Anual (Etapa 1 y Etapa 2)', anio:'2026', notaMinima:7.0, asistenciaMinima:75,
-                receso:'06/07 al 17/07'
-            },
-            alumnos: [],
-            asistencia: [],   // [alumno][fecha] = '' | 'P' | 'A'
-            tps: [],          // [alumno][tp] = número o null
-            notas: []         // [alumno][eval] = [nota, recup1, recup2]
-        };
+        let alumnos = [];
+        let fechas = [];
+        let rubricaCriterios = [
+            ['Formalización de Enunciados','No reconoce conectores.','Reconoce algunos con errores.','Formaliza correctamente.','Precisión total.'],
+            ['Tablas de Verdad','No construye.','Errores frecuentes.','Correcto.','Dominio avanzado.'],
+            ['Leyes Lógicas','Desconoce.','Aplica mal.','Bien.','Excelente.'],
+            ['Circuitos','No comprende.','Simples con error.','Correcto.','Optimiza.']
+        ];
 
-        function initState() {
-            const saved = localStorage.getItem('segAcadLogicMat');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state.metadatos = {...state.metadatos, ...parsed.metadatos};
-                    state.alumnos = parsed.alumnos || [];
-                    state.asistencia = parsed.asistencia || [];
-                    state.tps = parsed.tps || [];
-                    state.notas = parsed.notas || [];
-                } catch(e) {
-                    cargarIniciales();
+        // ==================== SINCRONIZACIÓN DE VARIABLES ====================
+        function actualizarAlumnos() {
+            const texto = document.getElementById('listaAlumnos').value.trim();
+            const lineas = texto.split('\n').filter(l => l.trim() !== '');
+            alumnos = lineas.map(linea => {
+                const partes = linea.trim().split(/\s+(.+)/); // DNI y resto nombre
+                const dni = partes[0] || '';
+                const nombre = partes[1] || '';
+                return { dni, nombre };
+            });
+            document.getElementById('contadorAlumnos').textContent = `${alumnos.length} alumnos cargados`;
+            guardarEstado();
+            renderizarPrevisualizaciones();
+        }
+
+        function actualizarFechas() {
+            const texto = document.getElementById('fechasClase').value.trim();
+            fechas = texto.split('\n').filter(l => l.trim() !== '').map(l => l.trim());
+            document.getElementById('contadorFechas').textContent = `${fechas.length} fechas`;
+            guardarEstado();
+            renderizarPrevisualizaciones();
+        }
+
+        function actualizarRubricaDesdeTabla() {
+            const filas = document.querySelectorAll('#tbodyRubrica tr');
+            rubricaCriterios = [];
+            filas.forEach(tr => {
+                const celdas = tr.querySelectorAll('td');
+                if (celdas.length >= 5) {
+                    const criterio = celdas[0].textContent.trim();
+                    const niveles = [celdas[1].textContent.trim(), celdas[2].textContent.trim(), celdas[3].textContent.trim(), celdas[4].textContent.trim()];
+                    rubricaCriterios.push([criterio, ...niveles]);
                 }
-            } else {
-                cargarIniciales();
-            }
-            if (!state.alumnos.length) cargarIniciales();
-            syncEstructuras();
-        }
-
-        function cargarIniciales() {
-            state.alumnos = JSON.parse(JSON.stringify(ALUMNOS_INICIALES));
-            const n = state.alumnos.length;
-            state.asistencia = Array.from({length:n}, () => FECHAS_CLASE.map(() => ''));
-            state.tps = Array.from({length:n}, () => Array(20).fill(null));
-            state.notas = Array.from({length:n}, () => Array.from({length:8}, () => [null,null,null]));
-        }
-
-        function syncEstructuras() {
-            const n = state.alumnos.length;
-            while(state.asistencia.length < n) state.asistencia.push(FECHAS_CLASE.map(()=>''));
-            state.asistencia = state.asistencia.slice(0,n);
-            state.asistencia.forEach((arr,i) => { while(arr.length < FECHAS_CLASE.length) arr.push(''); state.asistencia[i] = arr.slice(0, FECHAS_CLASE.length); });
-            while(state.tps.length < n) state.tps.push(Array(20).fill(null));
-            state.tps = state.tps.slice(0,n);
-            state.tps.forEach((arr,i) => { while(arr.length < 20) arr.push(null); state.tps[i] = arr.slice(0,20); });
-            while(state.notas.length < n) state.notas.push(Array.from({length:8}, () => [null,null,null]));
-            state.notas = state.notas.slice(0,n);
-            state.notas.forEach((arr,i) => {
-                while(arr.length < 8) arr.push([null,null,null]);
-                for(let j=0;j<8;j++) { if(!Array.isArray(arr[j]) || arr[j].length<3) arr[j]=[null,null,null]; arr[j] = arr[j].slice(0,3); }
-                state.notas[i] = arr.slice(0,8);
             });
+            guardarEstado();
         }
 
-        function guardar() {
-            syncEstructuras();
-            localStorage.setItem('segAcadLogicMat', JSON.stringify(state));
+        function agregarCriterio() {
+            rubricaCriterios.push(['Nuevo criterio', 'Descripción', 'Descripción', 'Descripción', 'Descripción']);
+            renderizarRubrica();
+            guardarEstado();
         }
 
-        // ==================== RENDERIZADO ====================
-        function renderAll() {
-            renderAlumnos();
-            renderAsistencia();
-            renderTPs();
-            renderNotas();
-            renderRubrica();
-            document.getElementById('metaAsignatura').value = state.metadatos.asignatura;
-            document.getElementById('metaCurso').value = state.metadatos.curso;
-            document.getElementById('metaDocente').value = state.metadatos.docente;
-            document.getElementById('metaRegimen').value = state.metadatos.regimen;
-            document.getElementById('metaAnio').value = state.metadatos.anio;
-            document.getElementById('metaNotaMin').value = state.metadatos.notaMinima;
-            document.getElementById('metaAsistMin').value = state.metadatos.asistenciaMinima;
-            document.getElementById('metaReceso').value = state.metadatos.receso;
+        // ==================== PREVISUALIZACIONES ====================
+        function renderizarPrevisualizaciones() {
+            renderizarAsistencia();
+            renderizarTPs();
+            renderizarNotas();
+            renderizarRubrica();
         }
 
-        function renderAlumnos() {
-            const tbody = document.getElementById('tbodyAlumnos');
-            tbody.innerHTML = state.alumnos.map((a,i) => `
-                <tr>
-                    <td class="sticky-col col-a">${i+1}</td>
-                    <td class="sticky-col col-b"><input class="cell-input" value="${a.dni}" data-idx="${i}" data-field="dni" style="width:85px;"></td>
-                    <td class="sticky-col col-c"><input class="cell-input" value="${a.nombre}" data-idx="${i}" data-field="nombre" style="width:195px;text-align:left;"></td>
-                    <td><button class="btn-sm" onclick="eliminarAlumno(${i})">🗑️</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('input').forEach(inp => {
-                inp.addEventListener('change', function() {
-                    const idx = +this.dataset.idx;
-                    const field = this.dataset.field;
-                    if (field === 'dni') state.alumnos[idx].dni = this.value;
-                    if (field === 'nombre') state.alumnos[idx].nombre = this.value;
-                    guardar(); renderAll();
-                });
-            });
-        }
-
-        function renderAsistencia() {
+        function renderizarAsistencia() {
             const thead = document.getElementById('theadAsistencia');
             const tbody = document.getElementById('tbodyAsistencia');
-            thead.innerHTML = `<tr><th class="sticky-col col-a">Nº</th><th class="sticky-col col-b">DNI</th><th class="sticky-col col-c">Alumno</th>${FECHAS_CLASE.map(f => `<th>${f.slice(0,5)}</th>`).join('')}<th>% Asist.</th></tr>`;
-            tbody.innerHTML = state.alumnos.map((a,i) => {
-                const pct = calcularPorcentajeAsistencia(state.asistencia[i] || []);
-                const claseColor = pct < state.metadatos.asistenciaMinima ? 'color:#9C0006;font-weight:bold;' : '';
+            thead.innerHTML = `<tr><th class="sticky-col col-a">Nº</th><th class="sticky-col col-b">DNI</th><th class="sticky-col col-c">Alumno</th>${fechas.map(f => `<th>${f.slice(0,5)}</th>`).join('')}<th>% Asist.</th></tr>`;
+            tbody.innerHTML = alumnos.map((a,i) => {
+                const pct = 100; // placeholder
                 return `<tr>
                     <td class="sticky-col col-a">${i+1}</td>
                     <td class="sticky-col col-b">${a.dni}</td>
-                    <td class="sticky-col col-c" style="text-align:left;">${a.nombre}</td>
-                    ${(state.asistencia[i]||[]).map((v,j) => `<td class="click-cell ${v==='P'?'P':v==='A'?'A':'empty'}" data-alumno="${i}" data-fecha="${j}">${v||'-'}</td>`).join('')}
-                    <td style="${claseColor}">${(pct).toFixed(1)}%</td>
+                    <td class="sticky-col col-c">${a.nombre}</td>
+                    ${fechas.map(() => `<td class="click-cell empty">-</td>`).join('')}
+                    <td>100%</td>
                 </tr>`;
             }).join('');
-            document.querySelectorAll('#tbodyAsistencia .click-cell').forEach(cell => {
-                cell.addEventListener('click', function() {
-                    const i = +this.dataset.alumno;
-                    const j = +this.dataset.fecha;
-                    const current = state.asistencia[i][j];
-                    if (current === '') state.asistencia[i][j] = 'P';
-                    else if (current === 'P') state.asistencia[i][j] = 'A';
-                    else state.asistencia[i][j] = '';
-                    guardar(); renderAsistencia();
-                });
-            });
         }
 
-        function renderTPs() {
+        function renderizarTPs() {
+            const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value) || 10;
+            const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value) || 10;
+            const totalTPs = tpsE1 + tpsE2;
             const thead = document.getElementById('theadTPs');
             const tbody = document.getElementById('tbodyTPs');
-            thead.innerHTML = `<tr><th class="sticky-col col-a">Nº</th><th class="sticky-col col-b">DNI</th><th class="sticky-col col-c">Alumno</th>
-                ${Array.from({length:20}, (_,i) => `<th>TP${i+1}</th>`).join('')}<th>Promedio TPs</th></tr>`;
-            tbody.innerHTML = state.alumnos.map((a,i) => {
-                const tps = state.tps[i] || [];
-                const promedio = tps.every(v=>v!==null&&!isNaN(v)) ? (tps.reduce((s,v)=>s+v,0)/20).toFixed(1) : '-';
-                return `<tr>
-                    <td class="sticky-col col-a">${i+1}</td>
-                    <td class="sticky-col col-b">${a.dni}</td>
-                    <td class="sticky-col col-c" style="text-align:left;">${a.nombre}</td>
-                    ${tps.map((v,j) => `<td><input class="cell-input" type="number" step="0.1" min="0" max="10" value="${v!=null?v:''}" data-alumno="${i}" data-tp="${j}"></td>`).join('')}
-                    <td style="font-weight:bold;">${promedio}</td>
-                </tr>`;
+            let htmlHead = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
+            if (tpsE1 > 0) htmlHead += `<th colspan="${tpsE1}">Etapa 1</th>`;
+            if (tpsE2 > 0) htmlHead += `<th colspan="${tpsE2}">Etapa 2</th>`;
+            htmlHead += `<th rowspan="2">Promedio</th></tr><tr>`;
+            for (let i=1; i<=tpsE1; i++) htmlHead += `<th>TP${i}</th>`;
+            for (let i=1; i<=tpsE2; i++) htmlHead += `<th>TP${tpsE1+i}</th>`;
+            htmlHead += `</tr>`;
+            thead.innerHTML = htmlHead;
+            tbody.innerHTML = alumnos.map((a,i) => {
+                let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
+                for (let j=0; j<totalTPs; j++) row += `<td><input class="cell-input" type="number" step="0.1" value=""></td>`;
+                row += `<td>-</td>`;
+                return `<tr>${row}</tr>`;
             }).join('');
-            tbody.querySelectorAll('input').forEach(inp => {
-                inp.addEventListener('change', function() {
-                    const i = +this.dataset.alumno;
-                    const j = +this.dataset.tp;
-                    const val = this.value === '' ? null : parseFloat(this.value);
-                    state.tps[i][j] = (val!==null && !isNaN(val)) ? Math.min(10, Math.max(0, val)) : null;
-                    guardar(); renderTPs();
-                });
-            });
         }
 
-        function renderNotas() {
+        function renderizarNotas() {
+            const evalsE1 = parseInt(document.getElementById('evalsEtapa1').value) || 4;
+            const evalsE2 = parseInt(document.getElementById('evalsEtapa2').value) || 4;
+            const recups = parseInt(document.getElementById('recupsPorEval').value) || 2;
+            const totalEvals = evalsE1 + evalsE2;
             const thead = document.getElementById('theadNotas');
             const tbody = document.getElementById('tbodyNotas');
-            const evalNombres = ['Eval1','Eval2','Eval3','Eval4','Eval5','Eval6','Eval7','Eval8'];
-            let headHTML = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
-            evalNombres.forEach(e => headHTML += `<th colspan="3">${e}</th>`);
-            headHTML += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
-            evalNombres.forEach(() => headHTML += `<th>Nota</th><th>Rec1</th><th>Rec2</th>`);
-            headHTML += `</tr>`;
-            thead.innerHTML = headHTML;
-
-            tbody.innerHTML = state.alumnos.map((a,i) => {
-                const notasAlumno = state.notas[i] || [];
-                const notaFinal = calcularNotaFinal(notasAlumno);
-                const pctAsist = calcularPorcentajeAsistencia(state.asistencia[i]||[]);
-                const estado = determinarEstado(notaFinal, pctAsist);
-                let estiloEstado = '';
-                if (estado === 'Aprobado') estiloEstado = 'background:#C6EFCE;color:#006100;';
-                else if (estado.includes('Libre')) estiloEstado = 'background:#FFC7CE;color:#9C0006;';
-                return `<tr>
-                    <td class="sticky-col col-a">${i+1}</td>
-                    <td class="sticky-col col-b">${a.dni}</td>
-                    <td class="sticky-col col-c" style="text-align:left;">${a.nombre}</td>
-                    ${notasAlumno.map((terna, ev) => 
-                        terna.map((v,k) => `<td><input class="cell-input" type="number" step="0.1" min="0" max="10" value="${v!=null?v:''}" data-alumno="${i}" data-eval="${ev}" data-rec="${k}"></td>`).join('')
-                    ).join('')}
-                    <td style="font-weight:bold;">${notaFinal!=null ? notaFinal.toFixed(1) : '-'}</td>
-                    <td style="font-weight:bold;${estiloEstado}">${estado}</td>
-                </tr>`;
+            let htmlHead = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
+            // Etapa 1
+            if (evalsE1 > 0) htmlHead += `<th colspan="${evalsE1 * (1+recups)}">Etapa 1</th>`;
+            if (evalsE2 > 0) htmlHead += `<th colspan="${evalsE2 * (1+recups)}">Etapa 2</th>`;
+            htmlHead += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
+            for (let e=1; e<=evalsE1; e++) {
+                htmlHead += `<th>Eval${e}</th>`;
+                for (let r=1; r<=recups; r++) htmlHead += `<th>Rec${r}</th>`;
+            }
+            for (let e=1; e<=evalsE2; e++) {
+                htmlHead += `<th>Eval${evalsE1+e}</th>`;
+                for (let r=1; r<=recups; r++) htmlHead += `<th>Rec${r}</th>`;
+            }
+            htmlHead += `</tr>`;
+            thead.innerHTML = htmlHead;
+            tbody.innerHTML = alumnos.map((a,i) => {
+                let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
+                for (let j=0; j<totalEvals*(1+recups); j++) row += `<td><input class="cell-input" type="number" step="0.1" value=""></td>`;
+                row += `<td>-</td><td>-</td>`;
+                return `<tr>${row}</tr>`;
             }).join('');
-            tbody.querySelectorAll('input').forEach(inp => {
-                inp.addEventListener('change', function() {
-                    const i = +this.dataset.alumno;
-                    const ev = +this.dataset.eval;
-                    const rec = +this.dataset.rec;
-                    const val = this.value === '' ? null : parseFloat(this.value);
-                    if (!state.notas[i]) state.notas[i] = Array.from({length:8},()=>[null,null,null]);
-                    if (!state.notas[i][ev]) state.notas[i][ev] = [null,null,null];
-                    state.notas[i][ev][rec] = (val!==null && !isNaN(val)) ? Math.min(10, Math.max(0, val)) : null;
-                    guardar(); renderNotas();
-                });
+        }
+
+        function renderizarRubrica() {
+            const tbody = document.getElementById('tbodyRubrica');
+            tbody.innerHTML = rubricaCriterios.map(c => `
+                <tr>
+                    <td contenteditable="true" style="text-align:left;font-weight:600;">${c[0]}</td>
+                    <td contenteditable="true" class="nivel-insuficiente">${c[1]}</td>
+                    <td contenteditable="true" class="nivel-regular">${c[2]}</td>
+                    <td contenteditable="true" class="nivel-bueno">${c[3]}</td>
+                    <td contenteditable="true" class="nivel-excelente">${c[4]}</td>
+                </tr>
+            `).join('');
+            document.querySelectorAll('#tbodyRubrica td[contenteditable]').forEach(td => {
+                td.addEventListener('blur', actualizarRubricaDesdeTabla);
             });
         }
 
-        function renderRubrica() {
-            const criterios = [
-                '1. Formalización de Enunciados y Conectores Lógicos.',
-                '2. Resolución e Interpretación de Tablas de Verdad y Tautologías.',
-                '3. Aplicación de Leyes Lógicas y Reglas de Inferencia.',
-                '4. Minimización de Funciones Booleanas y Diseño de Circuitos Lógicos.'
-            ];
-            const niveles = [
-                'No reconoce conectores lógicos básicos.',
-                'Reconoce algunos conectores pero comete errores.',
-                'Formaliza correctamente la mayoría de los enunciados.',
-                'Formaliza con precisión todo tipo de enunciados.'
-            ];
-            document.getElementById('tbodyRubrica').innerHTML = criterios.map(c => `
-                <tr><td style="text-align:left;font-weight:600;">${c}</td>
-                ${niveles.map(n => `<td>${n}</td>`).join('')}</tr>
-            `).join('');
-        }
-
-        function calcularNotaFinal(notasAlumno) {
-            if (!notasAlumno || notasAlumno.length < 8) return null;
-            const maximas = [];
-            for (let i=0; i<8; i++) {
-                const terna = notasAlumno[i] || [null,null,null];
-                const vals = terna.filter(v => v!==null && !isNaN(v));
-                if (vals.length === 0) return null;
-                maximas.push(Math.max(...vals));
-            }
-            return Math.round((maximas.reduce((a,b)=>a+b,0)/8)*10)/10;
-        }
-
-        function calcularPorcentajeAsistencia(arr) {
-            if (!arr || arr.length===0) return 0;
-            const total = arr.filter(v=>v==='P'||v==='A').length;
-            if (total===0) return 0;
-            return (arr.filter(v=>v==='P').length / total) * 100;
-        }
-
-        function determinarEstado(notaFinal, pctAsist) {
-            if (pctAsist < state.metadatos.asistenciaMinima) return 'Libre por Asistencia';
-            if (notaFinal === null) return 'Pendiente';
-            return notaFinal >= state.metadatos.notaMinima ? 'Aprobado' : 'Libre por Nota';
-        }
-
-        function agregarAlumno() {
-            state.alumnos.push({dni:'', nombre:''});
-            guardar(); renderAll();
-        }
-
-        function eliminarAlumno(idx) {
-            if (state.alumnos.length <= 1) return alert('Debe haber al menos un alumno.');
-            state.alumnos.splice(idx,1);
-            state.asistencia.splice(idx,1);
-            state.tps.splice(idx,1);
-            state.notas.splice(idx,1);
-            guardar(); renderAll();
+        // ==================== PDF IMPORT ====================
+        function procesarPDF(input) {
+            if (input.files.length === 0) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const typedarray = new Uint8Array(reader.result);
+                const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+                let textoCompleto = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const pageText = content.items.map(item => item.str).join(' ');
+                    textoCompleto += pageText + '\n';
+                }
+                // Intento de parseo simple: dividir por líneas y tomar las primeras 4 como criterios
+                const lineas = textoCompleto.split('\n').filter(l => l.trim().length > 10);
+                rubricaCriterios = lineas.slice(0, 4).map((l, idx) => {
+                    const partes = l.split(/[\.;]\s*/);
+                    return [
+                        partes[0] || `Criterio ${idx+1}`,
+                        partes[1] || 'Insuficiente',
+                        partes[2] || 'Regular',
+                        partes[3] || 'Bueno',
+                        partes[4] || 'Excelente'
+                    ];
+                });
+                if (rubricaCriterios.length === 0) rubricaCriterios = [['Extraído', 'Texto', 'del', 'PDF', 'completar']];
+                renderizarRubrica();
+                guardarEstado();
+                alert('Rúbrica importada desde PDF. Revisá y editá si es necesario.');
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         // ==================== GENERACIÓN DE EXCEL ====================
         function descargarExcel() {
-            // Actualizar metadatos desde los inputs
-            state.metadatos.asignatura = document.getElementById('metaAsignatura').value;
-            state.metadatos.curso = document.getElementById('metaCurso').value;
-            state.metadatos.docente = document.getElementById('metaDocente').value;
-            state.metadatos.regimen = document.getElementById('metaRegimen').value;
-            state.metadatos.anio = document.getElementById('metaAnio').value;
-            state.metadatos.notaMinima = parseFloat(document.getElementById('metaNotaMin').value) || 7.0;
-            state.metadatos.asistenciaMinima = parseInt(document.getElementById('metaAsistMin').value) || 75;
-            state.metadatos.receso = document.getElementById('metaReceso').value;
-            guardar();
-            syncEstructuras();
+            actualizarAlumnos();
+            actualizarFechas();
+            const sep = document.getElementById('separadorFormulas').value;
+            const notaMin = parseFloat(document.getElementById('notaMinima').value);
+            const asistMin = parseInt(document.getElementById('asistenciaMinima').value);
+            const evalsE1 = parseInt(document.getElementById('evalsEtapa1').value);
+            const evalsE2 = parseInt(document.getElementById('evalsEtapa2').value);
+            const recups = parseInt(document.getElementById('recupsPorEval').value);
+            const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value);
+            const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value);
+            const totalEvals = evalsE1 + evalsE2;
+            const totalTPs = tpsE1 + tpsE2;
+            const colsPorEval = 1 + recups;
 
             const wb = XLSX.utils.book_new();
 
-            // 1. Hoja Dashboard
-            const dashData = [
-                ['SEGUIMIENTO ACADÉMICO', '', '', ''],
-                ['Asignatura:', state.metadatos.asignatura, 'Curso:', state.metadatos.curso],
-                ['Docente:', state.metadatos.docente, 'Régimen:', state.metadatos.regimen],
-                ['Año:', state.metadatos.anio, 'Nota mínima:', state.metadatos.notaMinima],
-                ['Asistencia mínima:', state.metadatos.asistenciaMinima+'%', 'Receso:', state.metadatos.receso],
-                ['', '', '', ''],
-                ['MÉTRICAS', '', '', ''],
-                ['Total Alumnos', state.alumnos.length, '', ''],
-                ['Promedio General', {f: 'PROMEDIO(Notas!AB6:AB'+(5+state.alumnos.length)+')'}, '', ''],
-                ['Asistencia Promedio', {f: 'PROMEDIO(Asistencia!BX6:BX'+(5+state.alumnos.length)+')'}, '', ''],
-                ['', '', '', ''],
-                ['RESUMEN DE CONDICIONES', '', '', ''],
-                ['Aprobados', {f: 'CONTAR.SI(Notas!AC6:AC'+(5+state.alumnos.length)+';\"Aprobado\")'}, '', ''],
-                ['Libres por Nota', {f: 'CONTAR.SI(Notas!AC6:AC'+(5+state.alumnos.length)+';\"Libre por Nota\")'}, '', ''],
-                ['Libres por Asistencia', {f: 'CONTAR.SI(Notas!AC6:AC'+(5+state.alumnos.length)+';\"Libre por Asistencia\")'}, '', '']
+            // Dashboard (simplificado)
+            const dash = [
+                ['SEGUIMIENTO ACADÉMICO'],
+                ['Asignatura:', document.getElementById('asignatura').value],
+                ['Curso:', document.getElementById('curso').value],
+                ['Docente:', document.getElementById('docente').value],
+                ['Total Alumnos', alumnos.length],
+                ['Promedio General', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}],
+                ['Asistencia Promedio', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}]
             ];
-            const wsDash = XLSX.utils.aoa_to_sheet(dashData);
-            wsDash['!merges'] = [{s:{r:0,c:0},e:{r:0,c:3}}];
-            XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dash), "Dashboard");
 
-            // 2. Hoja Asistencia
-            const asisHeader = ['Nº', 'DNI', 'Apellido y Nombre', ...FECHAS_CLASE.map(f => f.slice(0,5)), '% Asistencia'];
+            // Asistencia
+            const asisHeader = ['Nº', 'DNI', 'Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
             const asisRows = [asisHeader];
-            state.alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre];
-                const asist = state.asistencia[i] || [];
-                FECHAS_CLASE.forEach((_,j) => row.push(asist[j] || ''));
-                const colBX = XLSX.utils.encode_col(3 + FECHAS_CLASE.length); // Columna después de fechas
-                const filaExcel = i+2; // +2 porque fila 1 es header
-                row.push({f: `SI(CONTARA(D${filaExcel}:${colBX}${filaExcel})>0;CONTAR.SI(D${filaExcel}:${colBX}${filaExcel};"P")/CONTARA(D${filaExcel}:${colBX}${filaExcel});0)`});
+            alumnos.forEach((a,i) => {
+                const row = [i+1, a.dni, a.nombre, ...fechas.map(() => '')];
+                const colAsis = XLSX.utils.encode_col(3+fechas.length);
+                const fila = i+2;
+                row.push({f: `SI(CONTARA(D${fila}:${colAsis}${fila})>0${sep}CONTAR.SI(D${fila}:${colAsis}${fila}${sep}"P")/CONTARA(D${fila}:${colAsis}${fila})${sep}0)`});
                 asisRows.push(row);
             });
             const wsAsis = XLSX.utils.aoa_to_sheet(asisRows);
             wsAsis['!freeze'] = {xSplit:3, ySplit:1};
             XLSX.utils.book_append_sheet(wb, wsAsis, "Asistencia");
 
-            // 3. Hoja Trabajos Prácticos
-            const tpsHeader = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length:20},(_,i)=>'TP'+(i+1)), 'Promedio TPs'];
+            // TPs
+            const tpsHeader = ['Nº', 'DNI', 'Nombre', ...Array.from({length:totalTPs}, (_,i) => `TP${i+1}`), 'Promedio'];
             const tpsRows = [tpsHeader];
-            state.alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre];
-                const tps = state.tps[i] || [];
-                for(let j=0; j<20; j++) row.push(tps[j]!=null ? tps[j] : '');
-                const colIni = XLSX.utils.encode_col(3);
-                const colFin = XLSX.utils.encode_col(22);
-                const fila = i+2;
-                row.push({f: `PROMEDIO(${colIni}${fila}:${colFin}${fila})`});
+            alumnos.forEach((a,i) => {
+                const row = [i+1, a.dni, a.nombre, ...Array(totalTPs).fill('')];
+                const colFinTP = XLSX.utils.encode_col(3+totalTPs);
+                row.push({f: `PROMEDIO(D${i+2}:${colFinTP}${i+2})`});
                 tpsRows.push(row);
             });
-            const wsTPs = XLSX.utils.aoa_to_sheet(tpsRows);
-            wsTPs['!freeze'] = {xSplit:3, ySplit:1};
-            XLSX.utils.book_append_sheet(wb, wsTPs, "TPs");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tpsRows), "TPs");
 
-            // 4. Hoja Notas
-            const notasHeader1 = ['Nº', 'DNI', 'Apellido y Nombre'];
+            // Notas
+            const notasHeader1 = ['Nº', 'DNI', 'Nombre'];
             const notasHeader2 = ['', '', ''];
-            const evals = ['Eval1','Eval2','Eval3','Eval4','Eval5','Eval6','Eval7','Eval8'];
-            evals.forEach(e => { notasHeader1.push(e); notasHeader1.push(''); notasHeader1.push(''); });
-            evals.forEach(() => { notasHeader2.push('Nota'); notasHeader2.push('Rec1'); notasHeader2.push('Rec2'); });
-            notasHeader1.push('Nota Final', 'Estado Académico');
+            for (let e=0; e<totalEvals; e++) {
+                notasHeader1.push(`Eval${e+1}`, ...Array(recups).fill(''));
+                notasHeader2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
+            }
+            notasHeader1.push('Nota Final', 'Estado');
             notasHeader2.push('', '');
             const notasRows = [notasHeader1, notasHeader2];
-
-            state.alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre];
-                const notasAl = state.notas[i] || [];
-                evals.forEach((_,ev) => {
-                    const terna = notasAl[ev] || [null,null,null];
-                    row.push(terna[0]!=null?terna[0]:'', terna[1]!=null?terna[1]:'', terna[2]!=null?terna[2]:'');
-                });
-                const fila = i+3; // datos desde fila 3 (1=header1, 2=header2)
-                // Fórmula Nota Final columna AB (índice 3+8*3 = 27 -> col AB)
-                const colAB = XLSX.utils.encode_col(27);
-                let formulaNotaFinal = '=PROMEDIO(';
-                const colIniciales = [3,6,9,12,15,18,21,24]; // columnas D,G,J,M,P,S,V,Y (0-index)
-                const partes = colIniciales.map(c => {
-                    const colLetra = XLSX.utils.encode_col(c);
-                    return `MAX(${colLetra}${fila}:${XLSX.utils.encode_col(c+2)}${fila})`;
-                });
-                formulaNotaFinal += partes.join(';') + ')';
-                row.push({f: formulaNotaFinal});
-
-                // Estado Académico
-                const colBXAsis = XLSX.utils.encode_col(3 + FECHAS_CLASE.length);
-                row.push({f: `SI(Asistencia!${colBXAsis}${fila}<${state.metadatos.asistenciaMinima}/100;"Libre por Asistencia";SI(${colAB}${fila}>=${state.metadatos.notaMinima};"Aprobado";"Libre por Nota"))`});
+            const colNotaFinal = 3 + totalEvals * colsPorEval;
+            const colEstado = colNotaFinal + 1;
+            alumnos.forEach((a,i) => {
+                const row = [i+1, a.dni, a.nombre, ...Array(totalEvals*colsPorEval).fill('')];
+                const fila = i+3;
+                // Fórmula Nota Final
+                let formula = '=PROMEDIO(';
+                const partes = [];
+                for (let e=0; e<totalEvals; e++) {
+                    const colIni = 3 + e*colsPorEval;
+                    const colFin = colIni + recups;
+                    partes.push(`MAX(${XLSX.utils.encode_col(colIni)}${fila}:${XLSX.utils.encode_col(colFin)}${fila})`);
+                }
+                formula += partes.join(sep) + ')';
+                row.push({f: formula});
+                // Estado
+                const colAsisRef = XLSX.utils.encode_col(3+fechas.length);
+                row.push({f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${XLSX.utils.encode_col(colNotaFinal)}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`});
                 notasRows.push(row);
             });
             const wsNotas = XLSX.utils.aoa_to_sheet(notasRows);
-            wsNotas['!merges'] = [
-                {s:{r:0,c:0},e:{r:1,c:0}}, {s:{r:0,c:1},e:{r:1,c:1}}, {s:{r:0,c:2},e:{r:1,c:2}},
-                {s:{r:0,c:27},e:{r:1,c:27}}, {s:{r:0,c:28},e:{r:1,c:28}}
-            ];
-            for(let i=0; i<8; i++) {
-                wsNotas['!merges'].push({s:{r:0,c:3+i*3},e:{r:0,c:5+i*3}});
-            }
             wsNotas['!freeze'] = {xSplit:3, ySplit:2};
             XLSX.utils.book_append_sheet(wb, wsNotas, "Notas");
 
-            // 5. Hoja Rúbrica
-            const rubricaData = [
-                ['Criterio', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'],
-                ['1. Formalización de Enunciados y Conectores Lógicos', 'No reconoce conectores.', 'Reconoce algunos con errores.', 'Formaliza correctamente la mayoría.', 'Formaliza con precisión.'],
-                ['2. Tablas de Verdad y Tautologías', 'No construye tablas.', 'Construye con errores.', 'Resuelve correctamente.', 'Domina tablas complejas.'],
-                ['3. Leyes Lógicas y Reglas de Inferencia', 'Desconoce leyes.', 'Aplica con errores.', 'Aplica correctamente.', 'Maestría en deducciones.'],
-                ['4. Minimización y Circuitos Lógicos', 'No comprende mapas K.', 'Minimizaciones simples con errores.', 'Minimiza correctamente.', 'Optimiza con múltiples métodos.']
-            ];
-            const wsRubrica = XLSX.utils.aoa_to_sheet(rubricaData);
-            XLSX.utils.book_append_sheet(wb, wsRubrica, "Rúbrica");
+            // Rúbrica
+            actualizarRubricaDesdeTabla();
+            const rubData = [['Criterio', 'Insuficiente', 'Regular', 'Bueno', 'Excelente'], ...rubricaCriterios];
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rubData), "Rúbrica");
 
-            // Aplicar anchos de columna básicos
-            [wsAsis, wsTPs, wsNotas].forEach(ws => {
-                ws['!cols'] = [{wch:4},{wch:12},{wch:28}];
-            });
-
-            // Descargar
-            XLSX.writeFile(wb, 'Seguimiento_LogicaMatematica_2026.xlsx');
+            XLSX.writeFile(wb, `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`);
         }
 
-        // ==================== NAVEGACIÓN ====================
+        // ==================== GUARDADO Y NAVEGACIÓN ====================
+        function guardarEstado() {
+            localStorage.setItem('genAcademico', JSON.stringify({
+                alumnos, fechas, rubricaCriterios,
+                asignatura: document.getElementById('asignatura').value,
+                curso: document.getElementById('curso').value,
+                docente: document.getElementById('docente').value,
+                regimen: document.getElementById('regimen').value,
+                anio: document.getElementById('anio').value,
+                receso: document.getElementById('receso').value,
+                notaMinima: document.getElementById('notaMinima').value,
+                asistenciaMinima: document.getElementById('asistenciaMinima').value,
+                evalsE1: document.getElementById('evalsEtapa1').value,
+                evalsE2: document.getElementById('evalsEtapa2').value,
+                recups: document.getElementById('recupsPorEval').value,
+                tpsE1: document.getElementById('tpsEtapa1').value,
+                tpsE2: document.getElementById('tpsEtapa2').value
+            }));
+        }
+
+        function cargarEstado() {
+            const saved = localStorage.getItem('genAcademico');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('asignatura').value = data.asignatura || '';
+                document.getElementById('curso').value = data.curso || '';
+                document.getElementById('docente').value = data.docente || '';
+                document.getElementById('regimen').value = data.regimen || '';
+                document.getElementById('anio').value = data.anio || '';
+                document.getElementById('receso').value = data.receso || '';
+                document.getElementById('notaMinima').value = data.notaMinima || 7.0;
+                document.getElementById('asistenciaMinima').value = data.asistenciaMinima || 75;
+                document.getElementById('evalsEtapa1').value = data.evalsE1 || 4;
+                document.getElementById('evalsEtapa2').value = data.evalsE2 || 4;
+                document.getElementById('recupsPorEval').value = data.recups || 2;
+                document.getElementById('tpsEtapa1').value = data.tpsE1 || 10;
+                document.getElementById('tpsEtapa2').value = data.tpsE2 || 10;
+                if (data.alumnos) {
+                    document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
+                }
+                if (data.fechas) {
+                    document.getElementById('fechasClase').value = data.fechas.join('\n');
+                }
+                rubricaCriterios = data.rubricaCriterios || rubricaCriterios;
+                actualizarAlumnos();
+                actualizarFechas();
+                renderizarRubrica();
+            } else {
+                actualizarAlumnos();
+                actualizarFechas();
+                renderizarRubrica();
+            }
+        }
+
+        // Event listeners
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -707,9 +566,17 @@
             });
         });
 
-        // Iniciar
-        initState();
-        renderAll();
+        document.getElementById('listaAlumnos').addEventListener('input', actualizarAlumnos);
+        document.getElementById('fechasClase').addEventListener('input', actualizarFechas);
+        ['asignatura','curso','docente','regimen','anio','receso','notaMinima','asistenciaMinima',
+         'evalsEtapa1','evalsEtapa2','recupsPorEval','tpsEtapa1','tpsEtapa2'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                guardarEstado();
+                renderizarPrevisualizaciones();
+            });
+        });
+
+        window.onload = cargarEstado;
     </script>
 </body>
 </html>
