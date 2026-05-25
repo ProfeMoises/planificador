@@ -137,16 +137,15 @@
     </nav>
 
     <main>
-        <!-- ==================== CONFIGURACIÓN ==================== -->
         <section class="tab-content active" id="tab-dashboard">
             <div class="card">
                 <h2>📌 Datos Generales de la Cátedra</h2>
                 <div class="grid-3">
-                    <div><label>Asignatura</label><input type="text" id="asignatura" value="Lógica Matemática"></div>
-                    <div><label>Curso / Comisión / Turno</label><input type="text" id="curso" value="4° C (Turno Mañana)"></div>
-                    <div><label>Docente(s)</label><input type="text" id="docente" value="Tinte Moisés"></div>
-                    <div><label>Régimen de Cursada</label><input type="text" id="regimen" value="Anual - Miércoles y Viernes"></div>
-                    <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" value="2026"></div>
+                    <div><label>Asignatura</label><input type="text" id="asignatura" placeholder="Nombre de la asignatura" value="Asignatura1"></div>
+                    <div><label>Curso / Comisión / Turno</label><input type="text" id="curso" placeholder="Ej: 4° C (Turno Mañana)" value="Curso1 (Turno Mañana)"></div>
+                    <div><label>Docente(s)</label><input type="text" id="docente" placeholder="Nombre del docente" value="NombreProfe"></div>
+                    <div><label>Régimen de Cursada</label><input type="text" id="regimen" placeholder="Ej: Anual - Miércoles y Viernes" value="Anual - Días a definir"></div>
+                    <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" placeholder="2026" value="2026"></div>
                     <div><label>Nota mínima de aprobación</label><input type="number" id="notaMinima" value="7.0" step="0.1"></div>
                     <div><label>Asistencia mínima (%)</label><input type="number" id="asistenciaMinima" value="75" step="1"></div>
                 </div>
@@ -154,41 +153,37 @@
             <div class="card">
                 <h2>👥 Nómina de Alumnos</h2>
                 <p style="font-size:0.8rem; color:#6B7280;">Pegá la lista completa (DNI + Nombre, uno por línea). El sistema separa automáticamente.</p>
-                <textarea id="listaAlumnos" placeholder="50696941 ALMIRA CHOQUE, ALUNEY SURYA&#10;...">50696941 ALMIRA CHOQUE, ALUNEY SURYA
-50630692 CARGNELUTTI ADET, FABRICCIO JOAQUIN
-50935810 CEPEDA CARDOZO, LUCAS TOBIAS
-50628869 CERESO, PIERINA LIBERTAD
-50947860 CHOQUE, SOFÍA MELANI</textarea>
+                <textarea id="listaAlumnos" placeholder="00000001 NOMBRE1 APELLIDO1&#10;00000002 NOMBRE2 APELLIDO2&#10;...">00000001 NOMBRE1 APELLIDO1
+00000002 NOMBRE2 APELLIDO2
+00000003 NOMBRE3 APELLIDO3
+00000004 NOMBRE4 APELLIDO4
+00000005 NOMBRE5 APELLIDO5</textarea>
                 <span class="badge" id="contadorAlumnos">5 alumnos cargados</span>
             </div>
             <div class="card">
                 <h2>📅 Cronograma Automático de Clases</h2>
                 <div class="grid-2">
-                    <div><label>Fecha de inicio del ciclo</label><input type="date" id="fechaInicio" value="2026-03-04"></div>
-                    <div><label>Fecha de fin del ciclo</label><input type="date" id="fechaFin" value="2026-12-18"></div>
+                    <div><label>Fecha de inicio del ciclo</label><input type="date" id="fechaInicio" value="2026-03-02"></div>
+                    <div><label>Fecha de fin del ciclo</label><input type="date" id="fechaFin" value="2026-11-30"></div>
                 </div>
                 <div style="margin-top:12px;">
                     <label>Días de clase</label>
                     <div class="checkbox-group" id="diasSemana">
-                        <label><input type="checkbox" value="1"> Lun</label>
-                        <label><input type="checkbox" value="2"> Mar</label>
+                        <label><input type="checkbox" value="1" checked> Lun</label>
+                        <label><input type="checkbox" value="2" checked> Mar</label>
                         <label><input type="checkbox" value="3" checked> Mié</label>
-                        <label><input type="checkbox" value="4"> Jue</label>
+                        <label><input type="checkbox" value="4" checked> Jue</label>
                         <label><input type="checkbox" value="5" checked> Vie</label>
                         <label><input type="checkbox" value="6"> Sáb</label>
                     </div>
                 </div>
                 <div class="grid-2" style="margin-top:12px;">
-                    <div><label>Receso: fecha inicio</label><input type="date" id="recesoInicio" value="2026-07-06"></div>
-                    <div><label>Receso: fecha fin</label><input type="date" id="recesoFin" value="2026-07-17"></div>
+                    <div><label>Receso: fecha inicio</label><input type="date" id="recesoInicio" value=""></div>
+                    <div><label>Receso: fecha fin</label><input type="date" id="recesoFin" value=""></div>
                 </div>
                 <div style="margin-top:12px;">
                     <label>Feriados (una fecha por línea, formato DD/MM/AAAA)</label>
-                    <textarea id="feriados">24/03/2026
-01/05/2026
-25/05/2026
-17/06/2026
-09/07/2026</textarea>
+                    <textarea id="feriados" placeholder="01/01/2026&#10;..."></textarea>
                 </div>
                 <button class="btn btn-generar" onclick="generarCronograma()">🔄 Generar Fechas de Clase</button>
                 <span class="badge" id="contadorFechas" style="margin-left:10px;">0 fechas generadas</span>
@@ -212,7 +207,6 @@
             </div>
         </section>
 
-        <!-- ==================== PREVISUALIZACIONES ==================== -->
         <section class="tab-content" id="tab-asistencia">
             <div class="card">
                 <h2>📋 Previsualización de Asistencia</h2>
@@ -246,10 +240,10 @@
         let alumnos = [];
         let fechas = [];
         let rubricaCriterios = [
-            ['Formalización de Enunciados','No reconoce conectores.','Reconoce algunos con errores.','Formaliza correctamente.','Precisión total.'],
-            ['Tablas de Verdad','No construye.','Errores frecuentes.','Correcto.','Dominio avanzado.'],
-            ['Leyes Lógicas','Desconoce.','Aplica mal.','Bien.','Excelente.'],
-            ['Circuitos','No comprende.','Simples con error.','Correcto.','Optimiza.']
+            ['Criterio 1', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
+            ['Criterio 2', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
+            ['Criterio 3', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
+            ['Criterio 4', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente']
         ];
 
         // ==================== FUNCIONES DE ACTUALIZACIÓN ====================
@@ -273,8 +267,8 @@
             if (isNaN(inicio) || isNaN(fin) || inicio > fin) { alert('Fechas inválidas'); return; }
             const diasSeleccionados = Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
             if (diasSeleccionados.length === 0) { alert('Seleccioná al menos un día de clase'); return; }
-            const recIni = new Date(document.getElementById('recesoInicio').value + 'T00:00:00');
-            const recFin = new Date(document.getElementById('recesoFin').value + 'T00:00:00');
+            const recIni = document.getElementById('recesoInicio').value ? new Date(document.getElementById('recesoInicio').value + 'T00:00:00') : null;
+            const recFin = document.getElementById('recesoFin').value ? new Date(document.getElementById('recesoFin').value + 'T00:00:00') : null;
             const feriadosTexto = document.getElementById('feriados').value.trim();
             const feriados = feriadosTexto.split('\n').filter(l => l.trim() !== '').map(l => {
                 const p = l.trim().split('/');
@@ -287,7 +281,10 @@
                 const diaSemana = current.getDay();
                 const idx = diaSemana === 0 ? 7 : diaSemana;
                 const esDiaClase = diasSeleccionados.includes(idx);
-                const esReceso = current >= recIni && current <= recFin;
+                let esReceso = false;
+                if (recIni && recFin && !isNaN(recIni) && !isNaN(recFin)) {
+                    esReceso = current >= recIni && current <= recFin;
+                }
                 const esFeriado = feriados.some(f => f.toDateString() === current.toDateString());
                 if (esDiaClase && !esReceso && !esFeriado) {
                     fechas.push(new Date(current));
@@ -540,76 +537,56 @@
             XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
 
             // ---------- ASISTENCIA ----------
-            const ultColAsis = 3 + fechas.length; // columnas A, B, C + fechas + %Asistencia = índice de %Asistencia
+            const ultColAsis = 3 + fechas.length;
             const colLetraUltAsis = XLSX.utils.encode_col(ultColAsis);
-            const asisHeader = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
-            const asisRows = [asisHeader];
-            alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre, ...fechas.map(() => '')];
-                const fila = i+2; // filas en Excel: 1=título, 2=vacía, 3=subtítulo, 4=cabecera, 5=vacía, 6=datos
-                row.push({f: `SI(CONTARA(D${fila}:${colLetraUltAsis}${fila})>0${sep}CONTAR.SI(D${fila}:${colLetraUltAsis}${fila}${sep}"P")/CONTARA(D${fila}:${colLetraUltAsis}${fila})${sep}0)`});
-                asisRows.push(row);
+            const wsAsis = {};
+            wsAsis['A1'] = { v: 'REGISTRO ANUAL DE ASISTENCIA', s: estiloCelda('titulo') };
+            wsAsis['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
+            wsAsis[`D3`] = { v: 'REGISTRO DE ASISTENCIA DIARIA', s: estiloCelda('subtitulo') };
+            wsAsis[`${colLetraUltAsis}3`] = { v: 'MÉTRICA', s: estiloCelda('subtitulo') };
+            const asisCab = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
+            asisCab.forEach((h, idx) => {
+                wsAsis[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
             });
-            const wsAsis = XLSX.utils.aoa_to_sheet(asisRows);
-            // Insertar filas de título y subtítulos reales (desplazar datos)
-            // Vamos a reconstruir la hoja manualmente para incluir las filas de formato
-            const newAsis = {};
-            // Fila 1: título
-            newAsis['A1'] = { v: 'REGISTRO ANUAL DE ASISTENCIA', s: estiloCelda('titulo') };
-            // Fila 2 vacía
-            // Fila 3: subtítulos
-            newAsis['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
-            newAsis['D3'] = { v: 'REGISTRO DE ASISTENCIA DIARIA', s: estiloCelda('subtitulo') };
-            newAsis[`${colLetraUltAsis}3`] = { v: 'MÉTRICA', s: estiloCelda('subtitulo') };
-            // Fila 4: cabeceras
-            asisHeader.forEach((h, idx) => {
-                const cellRef = XLSX.utils.encode_cell({r:3, c:idx}); // fila 4
-                newAsis[cellRef] = { v: h, s: estiloCelda('cabecera') };
-            });
-            // Filas de datos desde fila 5 (índice 4) hacia abajo
             for (let i = 0; i < alumnos.length; i++) {
-                const rowData = [i+1, alumnos[i].dni, alumnos[i].nombre, ...fechas.map(() => '')];
-                const filaExcel = i + 5; // fila 5 en adelante
-                rowData.forEach((val, c) => {
-                    const cellRef = XLSX.utils.encode_cell({r: filaExcel-1, c});
-                    newAsis[cellRef] = { v: val || '', s: estiloCelda('dato') };
-                });
-                // Fórmula % Asistencia
-                const cellRefPct = XLSX.utils.encode_cell({r: filaExcel-1, c: ultColAsis});
-                newAsis[cellRefPct] = { f: `SI(CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})>0${sep}CONTAR.SI(D${filaExcel}:${colLetraUltAsis}${filaExcel}${sep}"P")/CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})${sep}0)`, t: 'n', s: { ...estiloCelda('dato'), numFmt: '0%' } };
+                const filaExcel = i + 5;
+                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
+                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
+                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
+                for (let j = 0; j < fechas.length; j++) {
+                    wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
+                }
+                wsAsis[XLSX.utils.encode_cell({r:filaExcel-1, c:ultColAsis})] = {
+                    f: `SI(CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})>0${sep}CONTAR.SI(D${filaExcel}:${colLetraUltAsis}${filaExcel}${sep}"P")/CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})${sep}0)`,
+                    t: 'n', s: { ...estiloCelda('dato'), numFmt: '0%' }
+                };
             }
-            // Merges
-            newAsis['!merges'] = [
+            wsAsis['!merges'] = [
                 {s:{r:0,c:0}, e:{r:0,c:ultColAsis}},
                 {s:{r:2,c:0}, e:{r:2,c:2}},
                 {s:{r:2,c:3}, e:{r:2,c:ultColAsis-1}},
                 {s:{r:2,c:ultColAsis}, e:{r:2,c:ultColAsis}}
             ];
-            newAsis['!cols'] = [{wch:5},{wch:12},{wch:30}, ...fechas.map(() => ({wch:5})), {wch:10}];
-            newAsis['!rows'] = [{hpx:40}, {hpx:5}, {hpx:25}, {hpx:22}];
-            for (let i = 0; i < alumnos.length; i++) newAsis['!rows'].push({hpx:15});
-            newAsis['!freeze'] = { xSplit: 3, ySplit: 4 }; // Congelar en D5
+            wsAsis['!cols'] = [{wch:5},{wch:12},{wch:30}, ...fechas.map(() => ({wch:5})), {wch:10}];
+            wsAsis['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:22}];
+            for (let i=0; i<alumnos.length; i++) wsAsis['!rows'].push({hpx:15});
+            wsAsis['!freeze'] = { xSplit: 3, ySplit: 4 };
             wsAsis['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:4+alumnos.length-1, c:ultColAsis}});
-            Object.assign(wsAsis, newAsis);
             XLSX.utils.book_append_sheet(wb, wsAsis, "Asistencia");
 
             // ---------- TRABAJOS PRÁCTICOS ----------
-            const ultColTPs = 3 + totalTPs; // columna de Promedio
+            const ultColTPs = 3 + totalTPs;
             const colLetraUltTP = XLSX.utils.encode_col(ultColTPs);
             const wsTPs = {};
-            // Fila 1 título
             wsTPs['A1'] = { v: 'SEGUIMIENTO DE TRABAJOS PRÁCTICOS', s: estiloCelda('titulo') };
-            // Fila 3 subtítulos
             wsTPs['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
-            if (tpsE1 > 0) wsTPs[`D3`] = { v: 'ETAPA 1 (TP 1 - TP ' + tpsE1 + ')', s: estiloCelda('subtitulo') };
-            if (tpsE2 > 0) wsTPs[`${XLSX.utils.encode_col(3+tpsE1)}3`] = { v: 'ETAPA 2 (TP ' + (tpsE1+1) + ' - TP ' + totalTPs + ')', s: estiloCelda('subtitulo') };
+            if (tpsE1 > 0) wsTPs[`D3`] = { v: `ETAPA 1 (TP 1 - TP ${tpsE1})`, s: estiloCelda('subtitulo') };
+            if (tpsE2 > 0) wsTPs[`${XLSX.utils.encode_col(3+tpsE1)}3`] = { v: `ETAPA 2 (TP ${tpsE1+1} - TP ${totalTPs})`, s: estiloCelda('subtitulo') };
             wsTPs[`${colLetraUltTP}3`] = { v: 'PROMEDIO', s: estiloCelda('subtitulo') };
-            // Fila 4 cabeceras
-            const tpsCabeceras = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
-            tpsCabeceras.forEach((h, idx) => {
+            const tpsCab = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
+            tpsCab.forEach((h, idx) => {
                 wsTPs[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
             });
-            // Datos desde fila 5
             for (let i = 0; i < alumnos.length; i++) {
                 const fila = i + 5;
                 wsTPs[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
@@ -641,30 +618,18 @@
             const colLetraEst = XLSX.utils.encode_col(colEstado);
             const wsNotas = {};
             wsNotas['A1'] = { v: 'CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES', s: estiloCelda('titulo') };
-            // Fila 3 subtítulos
             wsNotas['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
             if (evalsE1 > 0) wsNotas[`D3`] = { v: 'EVALUACIONES - ETAPA 1', s: estiloCelda('subtitulo') };
             if (evalsE2 > 0) wsNotas[`${XLSX.utils.encode_col(3+evalsE1*colsPorEval)}3`] = { v: 'EVALUACIONES - ETAPA 2', s: estiloCelda('subtitulo') };
             wsNotas[`${colLetraNF}3`] = { v: 'RESULTADOS FINALES', s: estiloCelda('subtitulo') };
-            // Fila 4 cabeceras
             const cabNotas = ['Nº', 'DNI', 'Apellido y Nombre'];
-            for (let e=1; e<=totalEvals; e++) {
-                cabNotas.push(`Ev${e}`, ...Array(recups).fill(''));
-            }
+            for (let e=1; e<=totalEvals; e++) cabNotas.push(`Ev${e}`, ...Array(recups).fill(''));
             cabNotas.push('Nota Final', 'Estado Académico');
             const cabNotas2 = ['', '', ''];
-            for (let e=1; e<=totalEvals; e++) {
-                cabNotas2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
-            }
+            for (let e=1; e<=totalEvals; e++) cabNotas2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
             cabNotas2.push('', '');
-            // Insertar fila 4 con cabNotas y fila 5 con cabNotas2
-            cabNotas.forEach((h, idx) => {
-                wsNotas[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
-            });
-            cabNotas2.forEach((h, idx) => {
-                wsNotas[XLSX.utils.encode_cell({r:4, c:idx})] = { v: h, s: estiloCelda('cabecera') };
-            });
-            // Datos desde fila 6
+            cabNotas.forEach((h, idx) => wsNotas[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') });
+            cabNotas2.forEach((h, idx) => wsNotas[XLSX.utils.encode_cell({r:4, c:idx})] = { v: h, s: estiloCelda('cabecera') });
             for (let i = 0; i < alumnos.length; i++) {
                 const fila = i + 6;
                 wsNotas[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
@@ -673,7 +638,6 @@
                 for (let j=0; j<totalEvals*colsPorEval; j++) {
                     wsNotas[XLSX.utils.encode_cell({r:fila-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
                 }
-                // Nota Final
                 let formulaNF = '=PROMEDIO(';
                 const partes = [];
                 for (let e=0; e<totalEvals; e++) {
@@ -683,14 +647,12 @@
                 }
                 formulaNF += partes.join(sep) + ')';
                 wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colNotaFinal})] = { f: formulaNF, t: 'n', s: estiloCelda('nota_final') };
-                // Estado
                 const colAsisRef = XLSX.utils.encode_col(3+fechas.length);
                 wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colEstado})] = {
                     f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetraNF}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`,
                     t: 's', s: estiloCelda('dato')
                 };
             }
-            // Merges
             wsNotas['!merges'] = [
                 {s:{r:0,c:0}, e:{r:0,c:colEstado}},
                 {s:{r:2,c:0}, e:{r:2,c:2}},
@@ -718,13 +680,10 @@
             const wsRub = {};
             wsRub['A1'] = { v: 'MATRIZ DE EVALUACIÓN DE COMPETENCIAS', s: estiloCelda('titulo') };
             const rubCab = ['Criterio de Evaluación', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'];
-            rubCab.forEach((h, idx) => {
-                wsRub[XLSX.utils.encode_cell({r:2, c:idx})] = { v: h, s: estiloCelda('subtitulo') };
-            });
+            rubCab.forEach((h, idx) => wsRub[XLSX.utils.encode_cell({r:2, c:idx})] = { v: h, s: estiloCelda('subtitulo') });
             rubricaCriterios.forEach((criterio, i) => {
                 criterio.forEach((texto, j) => {
-                    const cellRef = XLSX.utils.encode_cell({r:3+i, c:j});
-                    wsRub[cellRef] = { v: texto, s: { ...estiloCelda('dato'), alignment: { horizontal: j===0 ? 'left' : 'center', vertical: 'center', wrapText: true } } };
+                    wsRub[XLSX.utils.encode_cell({r:3+i, c:j})] = { v: texto, s: { ...estiloCelda('dato'), alignment: { horizontal: j===0 ? 'left' : 'center', vertical: 'center', wrapText: true } } };
                 });
             });
             wsRub['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:4}}];
@@ -766,11 +725,11 @@
             const saved = localStorage.getItem('genAcademico_v3');
             if (saved) {
                 const data = JSON.parse(saved);
-                document.getElementById('asignatura').value = data.asignatura || '';
-                document.getElementById('curso').value = data.curso || '';
-                document.getElementById('docente').value = data.docente || '';
-                document.getElementById('regimen').value = data.regimen || '';
-                document.getElementById('anio').value = data.anio || '';
+                document.getElementById('asignatura').value = data.asignatura || 'Asignatura1';
+                document.getElementById('curso').value = data.curso || 'Curso1 (Turno Mañana)';
+                document.getElementById('docente').value = data.docente || 'NombreProfe';
+                document.getElementById('regimen').value = data.regimen || 'Anual - Días a definir';
+                document.getElementById('anio').value = data.anio || '2026';
                 document.getElementById('notaMinima').value = data.notaMinima || 7.0;
                 document.getElementById('asistenciaMinima').value = data.asistenciaMinima || 75;
                 document.getElementById('evalsEtapa1').value = data.evalsE1 || 4;
@@ -784,7 +743,7 @@
                 if (data.recesoFin) document.getElementById('recesoFin').value = data.recesoFin;
                 if (data.feriados) document.getElementById('feriados').value = data.feriados;
                 const checks = document.querySelectorAll('#diasSemana input[type="checkbox"]');
-                checks.forEach(cb => { cb.checked = data.diasSeleccionados ? data.diasSeleccionados.includes(cb.value) : (cb.value === '3' || cb.value === '5'); });
+                checks.forEach(cb => { cb.checked = data.diasSeleccionados ? data.diasSeleccionados.includes(cb.value) : true; });
                 if (data.alumnos) document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
                 fechas = data.fechas || [];
                 document.getElementById('fechasClase').value = fechas.join('\n');
