@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador Dinámico de Libro Excel Académico</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- xlsx-js-style para soporte de estilos en Excel -->
+    <script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
@@ -54,6 +55,8 @@
         .btn-excel:hover { background: #185a32; }
         .btn-upload { background: #4F46E5; color: white; }
         .btn-upload:hover { background: #4338CA; }
+        .btn-generar { background: #0D9488; color: white; }
+        .btn-generar:hover { background: #0F766E; }
         .tab-nav {
             display: flex;
             background: white;
@@ -86,6 +89,7 @@
         }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
         label { font-size: 0.8rem; font-weight: 600; color: #4B5563; display: block; margin-bottom: 4px; }
         input, select, textarea {
             width: 100%;
@@ -118,13 +122,15 @@
         .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #FEE2E2; color: #DC2626; border: none; border-radius: 4px; cursor: pointer; }
         .badge { display: inline-block; background: #E0E7FF; color: #3730A3; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
         hr { border: 0.5px solid #E5E7EB; margin: 12px 0; }
+        .checkbox-group label { display: inline-flex; align-items: center; gap: 4px; margin-right: 12px; font-weight: normal; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
     </style>
 </head>
 <body>
     <header class="app-header">
         <div>
             <h1>📐 Generador de Excel Académico (Multi-Asignatura)</h1>
-            <div style="font-size:0.8rem;opacity:0.85;" id="headerSubtitulo">Configurá tu materia y descargá el libro</div>
+            <div style="font-size:0.8rem;opacity:0.85;" id="headerSubtitulo">Configurá tu materia y descargá el libro con estilo profesional</div>
         </div>
         <div>
             <button class="btn btn-upload" onclick="document.getElementById('pdfUpload').click()">📄 Importar Rúbrica desde PDF</button>
@@ -152,7 +158,6 @@
                     <div><label>Docente(s)</label><input type="text" id="docente" value="Tinte Moisés"></div>
                     <div><label>Régimen de Cursada</label><input type="text" id="regimen" value="Anual - Miércoles y Viernes"></div>
                     <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" value="2026"></div>
-                    <div><label>Receso / Vacaciones</label><input type="text" id="receso" value="06/07 al 17/07"></div>
                     <div><label>Nota mínima de aprobación</label><input type="number" id="notaMinima" value="7.0" step="0.1"></div>
                     <div><label>Asistencia mínima (%)</label><input type="number" id="asistenciaMinima" value="75" step="1"></div>
                 </div>
@@ -167,15 +172,52 @@
 50947860 CHOQUE, SOFÍA MELANI</textarea>
                 <span class="badge" id="contadorAlumnos">5 alumnos cargados</span>
             </div>
+            <!-- NUEVO: Generación automática de fechas -->
             <div class="card">
-                <h2>📅 Cronograma de Fechas de Clase</h2>
-                <p style="font-size:0.8rem; color:#6B7280;">Una fecha por línea (formato DD/MM/AAAA). Se usarán como columnas de asistencia.</p>
-                <textarea id="fechasClase">04/03/2026
-06/03/2026
-11/03/2026
-13/03/2026
-18/03/2026</textarea>
-                <span class="badge" id="contadorFechas">5 fechas</span>
+                <h2>📅 Cronograma Automático de Clases</h2>
+                <div class="grid-2">
+                    <div>
+                        <label>Fecha de inicio del ciclo</label>
+                        <input type="date" id="fechaInicio" value="2026-03-04">
+                    </div>
+                    <div>
+                        <label>Fecha de fin del ciclo</label>
+                        <input type="date" id="fechaFin" value="2026-12-18">
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <label>Días de clase</label>
+                    <div class="checkbox-group" id="diasSemana">
+                        <label><input type="checkbox" value="1"> Lun</label>
+                        <label><input type="checkbox" value="2"> Mar</label>
+                        <label><input type="checkbox" value="3" checked> Mié</label>
+                        <label><input type="checkbox" value="4"> Jue</label>
+                        <label><input type="checkbox" value="5" checked> Vie</label>
+                        <label><input type="checkbox" value="6"> Sáb</label>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top:12px;">
+                    <div>
+                        <label>Receso: fecha inicio</label>
+                        <input type="date" id="recesoInicio" value="2026-07-06">
+                    </div>
+                    <div>
+                        <label>Receso: fecha fin</label>
+                        <input type="date" id="recesoFin" value="2026-07-17">
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <label>Feriados (una fecha por línea, formato DD/MM/AAAA)</label>
+                    <textarea id="feriados" placeholder="24/03/2026&#10;01/05/2026&#10;25/05/2026&#10;17/06/2026&#10;09/07/2026">24/03/2026
+01/05/2026
+25/05/2026
+17/06/2026
+09/07/2026</textarea>
+                </div>
+                <button class="btn btn-generar" onclick="generarCronograma()">🔄 Generar Fechas de Clase</button>
+                <span class="badge" id="contadorFechas" style="margin-left:10px;">0 fechas generadas</span>
+                <!-- Textarea oculto para mantener compatibilidad -->
+                <textarea id="fechasClase" style="display:none;"></textarea>
             </div>
             <div class="card">
                 <h2>⚙️ Estructura de Evaluaciones y TPs</h2>
@@ -235,12 +277,12 @@
             ['Circuitos','No comprende.','Simples con error.','Correcto.','Optimiza.']
         ];
 
-        // ==================== SINCRONIZACIÓN DE VARIABLES ====================
+        // ==================== ACTUALIZACIÓN DE ALUMNOS Y FECHAS ====================
         function actualizarAlumnos() {
             const texto = document.getElementById('listaAlumnos').value.trim();
             const lineas = texto.split('\n').filter(l => l.trim() !== '');
             alumnos = lineas.map(linea => {
-                const partes = linea.trim().split(/\s+(.+)/); // DNI y resto nombre
+                const partes = linea.trim().split(/\s+(.+)/);
                 const dni = partes[0] || '';
                 const nombre = partes[1] || '';
                 return { dni, nombre };
@@ -250,10 +292,58 @@
             renderizarPrevisualizaciones();
         }
 
-        function actualizarFechas() {
-            const texto = document.getElementById('fechasClase').value.trim();
-            fechas = texto.split('\n').filter(l => l.trim() !== '').map(l => l.trim());
-            document.getElementById('contadorFechas').textContent = `${fechas.length} fechas`;
+        function generarCronograma() {
+            const inicio = new Date(document.getElementById('fechaInicio').value + 'T00:00:00');
+            const fin = new Date(document.getElementById('fechaFin').value + 'T00:00:00');
+            if (isNaN(inicio) || isNaN(fin) || inicio > fin) {
+                alert('Fechas inválidas');
+                return;
+            }
+            // Días seleccionados (1=Lun,..,6=Sáb)
+            const diasSeleccionados = [];
+            document.querySelectorAll('#diasSemana input[type="checkbox"]:checked').forEach(cb => {
+                diasSeleccionados.push(parseInt(cb.value));
+            });
+            if (diasSeleccionados.length === 0) {
+                alert('Seleccioná al menos un día de clase');
+                return;
+            }
+            // Receso
+            const recIni = new Date(document.getElementById('recesoInicio').value + 'T00:00:00');
+            const recFin = new Date(document.getElementById('recesoFin').value + 'T00:00:00');
+            // Feriados (parsear dd/mm/aaaa)
+            const feriadosTexto = document.getElementById('feriados').value.trim();
+            const feriados = feriadosTexto.split('\n').filter(l => l.trim() !== '').map(l => {
+                const partes = l.trim().split('/');
+                if (partes.length === 3) {
+                    return new Date(partes[2], partes[1]-1, partes[0]);
+                }
+                return null;
+            }).filter(d => d && !isNaN(d));
+            // Generar fechas
+            const fechasGeneradas = [];
+            const current = new Date(inicio);
+            while (current <= fin) {
+                const diaSemana = current.getDay(); // 0=Dom, 1=Lun..6=Sáb
+                // Convertir a índice 1-7 (Lun=1, Dom=7)
+                const idx = diaSemana === 0 ? 7 : diaSemana;
+                const esDiaClase = diasSeleccionados.includes(idx);
+                const esReceso = current >= recIni && current <= recFin;
+                const esFeriado = feriados.some(f => f.toDateString() === current.toDateString());
+                if (esDiaClase && !esReceso && !esFeriado) {
+                    fechasGeneradas.push(new Date(current));
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            // Formatear a DD/MM/AAAA
+            fechas = fechasGeneradas.map(d => {
+                const dia = String(d.getDate()).padStart(2,'0');
+                const mes = String(d.getMonth()+1).padStart(2,'0');
+                const anio = d.getFullYear();
+                return `${dia}/${mes}/${anio}`;
+            });
+            document.getElementById('fechasClase').value = fechas.join('\n');
+            document.getElementById('contadorFechas').textContent = `${fechas.length} fechas generadas`;
             guardarEstado();
             renderizarPrevisualizaciones();
         }
@@ -332,7 +422,6 @@
             const thead = document.getElementById('theadNotas');
             const tbody = document.getElementById('tbodyNotas');
             let htmlHead = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
-            // Etapa 1
             if (evalsE1 > 0) htmlHead += `<th colspan="${evalsE1 * (1+recups)}">Etapa 1</th>`;
             if (evalsE2 > 0) htmlHead += `<th colspan="${evalsE2 * (1+recups)}">Etapa 2</th>`;
             htmlHead += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
@@ -385,7 +474,6 @@
                     const pageText = content.items.map(item => item.str).join(' ');
                     textoCompleto += pageText + '\n';
                 }
-                // Intento de parseo simple: dividir por líneas y tomar las primeras 4 como criterios
                 const lineas = textoCompleto.split('\n').filter(l => l.trim().length > 10);
                 rubricaCriterios = lineas.slice(0, 4).map((l, idx) => {
                     const partes = l.split(/[\.;]\s*/);
@@ -405,10 +493,49 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // ==================== GENERACIÓN DE EXCEL ====================
+        // ==================== GENERACIÓN DE EXCEL CON FORMATO ====================
+        function aplicarEstiloCelda(cell, tipo, valor) {
+            // Estilos base
+            cell.s = {
+                font: { name: 'Segoe UI', sz: 10, bold: false, color: { rgb: "1F2937" } },
+                fill: { fgColor: { rgb: "FFFFFF" } },
+                alignment: { vertical: 'center', horizontal: 'center', wrapText: false },
+                border: {
+                    top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                    bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                    left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                    right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+                }
+            };
+            if (tipo === 'header') {
+                cell.s.font = { name: 'Segoe UI', sz: 9, bold: true, color: { rgb: "FFFFFF" } };
+                cell.s.fill = { fgColor: { rgb: "1F4E79" } };
+            } else if (tipo === 'subheader') {
+                cell.s.font = { name: 'Segoe UI', sz: 8, bold: true, color: { rgb: "FFFFFF" } };
+                cell.s.fill = { fgColor: { rgb: "2B6BAE" } };
+            } else if (tipo === 'data') {
+                cell.s.fill = { fgColor: { rgb: "FFFFFF" } };
+            } else if (tipo === 'data-alt') {
+                cell.s.fill = { fgColor: { rgb: "F9FAFB" } };
+            }
+            // Formato numérico
+            if (typeof valor === 'number' && !isNaN(valor)) {
+                cell.t = 'n';
+                cell.v = valor;
+                cell.s.numFmt = '0.0';
+            } else if (valor && typeof valor === 'object' && valor.f) {
+                cell.t = 'n';
+                cell.f = valor.f;
+                cell.s.numFmt = '0.0';
+            }
+        }
+
         function descargarExcel() {
             actualizarAlumnos();
-            actualizarFechas();
+            if (fechas.length === 0) {
+                alert('Primero generá el cronograma de fechas.');
+                return;
+            }
             const sep = document.getElementById('separadorFormulas').value;
             const notaMin = parseFloat(document.getElementById('notaMinima').value);
             const asistMin = parseInt(document.getElementById('asistenciaMinima').value);
@@ -423,19 +550,37 @@
 
             const wb = XLSX.utils.book_new();
 
-            // Dashboard (simplificado)
-            const dash = [
-                ['SEGUIMIENTO ACADÉMICO'],
-                ['Asignatura:', document.getElementById('asignatura').value],
-                ['Curso:', document.getElementById('curso').value],
-                ['Docente:', document.getElementById('docente').value],
-                ['Total Alumnos', alumnos.length],
-                ['Promedio General', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}],
-                ['Asistencia Promedio', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}]
+            // ----- DASHBOARD -----
+            const dashData = [
+                ['SEGUIMIENTO ACADÉMICO', '', '', ''],
+                ['Asignatura:', document.getElementById('asignatura').value, 'Curso:', document.getElementById('curso').value],
+                ['Docente:', document.getElementById('docente').value, 'Régimen:', document.getElementById('regimen').value],
+                ['Año:', document.getElementById('anio').value, 'Nota mínima:', notaMin],
+                ['Asistencia mínima:', asistMin + '%', 'Receso:', document.getElementById('recesoInicio').value + ' al ' + document.getElementById('recesoFin').value],
+                ['', '', '', ''],
+                ['MÉTRICAS', '', '', ''],
+                ['Total Alumnos', alumnos.length, '', ''],
+                ['Promedio General', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}, '', ''],
+                ['Asistencia Promedio', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}, '', ''],
+                ['', '', '', ''],
+                ['RESUMEN DE CONDICIONES', '', '', ''],
+                ['Aprobados', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Aprobado")`}, '', ''],
+                ['Libres por Nota', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Nota")`}, '', ''],
+                ['Libres por Asistencia', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Asistencia")`}, '', '']
             ];
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dash), "Dashboard");
+            const wsDash = XLSX.utils.aoa_to_sheet(dashData);
+            // Estilos para Dashboard (solo encabezados)
+            for (let R = 0; R < dashData.length; R++) {
+                for (let C = 0; C < dashData[R].length; C++) {
+                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+                    if (!wsDash[cellRef]) wsDash[cellRef] = {v: ''};
+                    aplicarEstiloCelda(wsDash[cellRef], R === 0 ? 'header' : 'data', dashData[R][C]);
+                }
+            }
+            wsDash['!merges'] = [{s:{r:0,c:0},e:{r:0,c:3}}];
+            XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
 
-            // Asistencia
+            // ----- ASISTENCIA -----
             const asisHeader = ['Nº', 'DNI', 'Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
             const asisRows = [asisHeader];
             alumnos.forEach((a,i) => {
@@ -446,10 +591,19 @@
                 asisRows.push(row);
             });
             const wsAsis = XLSX.utils.aoa_to_sheet(asisRows);
+            for (let R = 0; R < asisRows.length; R++) {
+                for (let C = 0; C < asisRows[R].length; C++) {
+                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+                    if (!wsAsis[cellRef]) wsAsis[cellRef] = {v: ''};
+                    const tipo = R === 0 ? 'header' : (R % 2 === 0 ? 'data-alt' : 'data');
+                    aplicarEstiloCelda(wsAsis[cellRef], tipo, asisRows[R][C]);
+                    if (C >= 3 + fechas.length) wsAsis[cellRef].s.numFmt = '0%';
+                }
+            }
             wsAsis['!freeze'] = {xSplit:3, ySplit:1};
             XLSX.utils.book_append_sheet(wb, wsAsis, "Asistencia");
 
-            // TPs
+            // ----- TPs -----
             const tpsHeader = ['Nº', 'DNI', 'Nombre', ...Array.from({length:totalTPs}, (_,i) => `TP${i+1}`), 'Promedio'];
             const tpsRows = [tpsHeader];
             alumnos.forEach((a,i) => {
@@ -458,9 +612,17 @@
                 row.push({f: `PROMEDIO(D${i+2}:${colFinTP}${i+2})`});
                 tpsRows.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tpsRows), "TPs");
+            const wsTPs = XLSX.utils.aoa_to_sheet(tpsRows);
+            for (let R = 0; R < tpsRows.length; R++) {
+                for (let C = 0; C < tpsRows[R].length; C++) {
+                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+                    if (!wsTPs[cellRef]) wsTPs[cellRef] = {v: ''};
+                    aplicarEstiloCelda(wsTPs[cellRef], R === 0 ? 'header' : (R%2===0?'data-alt':'data'), tpsRows[R][C]);
+                }
+            }
+            XLSX.utils.book_append_sheet(wb, wsTPs, "TPs");
 
-            // Notas
+            // ----- NOTAS -----
             const notasHeader1 = ['Nº', 'DNI', 'Nombre'];
             const notasHeader2 = ['', '', ''];
             for (let e=0; e<totalEvals; e++) {
@@ -475,7 +637,6 @@
             alumnos.forEach((a,i) => {
                 const row = [i+1, a.dni, a.nombre, ...Array(totalEvals*colsPorEval).fill('')];
                 const fila = i+3;
-                // Fórmula Nota Final
                 let formula = '=PROMEDIO(';
                 const partes = [];
                 for (let e=0; e<totalEvals; e++) {
@@ -485,45 +646,80 @@
                 }
                 formula += partes.join(sep) + ')';
                 row.push({f: formula});
-                // Estado
                 const colAsisRef = XLSX.utils.encode_col(3+fechas.length);
                 row.push({f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${XLSX.utils.encode_col(colNotaFinal)}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`});
                 notasRows.push(row);
             });
             const wsNotas = XLSX.utils.aoa_to_sheet(notasRows);
+            // Estilos
+            for (let R = 0; R < notasRows.length; R++) {
+                for (let C = 0; C < notasRows[R].length; C++) {
+                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+                    if (!wsNotas[cellRef]) wsNotas[cellRef] = {v: ''};
+                    let tipo = 'data';
+                    if (R === 0) tipo = 'header';
+                    else if (R === 1) tipo = 'subheader';
+                    else if (R % 2 === 0) tipo = 'data-alt';
+                    aplicarEstiloCelda(wsNotas[cellRef], tipo, notasRows[R][C]);
+                }
+            }
+            // Merges para encabezados de etapa
+            wsNotas['!merges'] = [
+                {s:{r:0,c:0},e:{r:1,c:0}}, {s:{r:0,c:1},e:{r:1,c:1}}, {s:{r:0,c:2},e:{r:1,c:2}},
+                {s:{r:0,c:colNotaFinal},e:{r:1,c:colNotaFinal}}, {s:{r:0,c:colEstado},e:{r:1,c:colEstado}}
+            ];
+            if (evalsE1 > 0) {
+                wsNotas['!merges'].push({s:{r:0,c:3},e:{r:0,c:3+evalsE1*colsPorEval-1}});
+            }
+            if (evalsE2 > 0) {
+                wsNotas['!merges'].push({s:{r:0,c:3+evalsE1*colsPorEval},e:{r:0,c:3+totalEvals*colsPorEval-1}});
+            }
             wsNotas['!freeze'] = {xSplit:3, ySplit:2};
             XLSX.utils.book_append_sheet(wb, wsNotas, "Notas");
 
-            // Rúbrica
+            // ----- RÚBRICA -----
             actualizarRubricaDesdeTabla();
-            const rubData = [['Criterio', 'Insuficiente', 'Regular', 'Bueno', 'Excelente'], ...rubricaCriterios];
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rubData), "Rúbrica");
+            const rubData = [['Criterio', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'], ...rubricaCriterios];
+            const wsRub = XLSX.utils.aoa_to_sheet(rubData);
+            for (let R = 0; R < rubData.length; R++) {
+                for (let C = 0; C < rubData[R].length; C++) {
+                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+                    if (!wsRub[cellRef]) wsRub[cellRef] = {v: ''};
+                    aplicarEstiloCelda(wsRub[cellRef], R === 0 ? 'header' : 'data', rubData[R][C]);
+                }
+            }
+            XLSX.utils.book_append_sheet(wb, wsRub, "Rúbrica");
 
             XLSX.writeFile(wb, `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`);
         }
 
         // ==================== GUARDADO Y NAVEGACIÓN ====================
         function guardarEstado() {
-            localStorage.setItem('genAcademico', JSON.stringify({
+            localStorage.setItem('genAcademico_v2', JSON.stringify({
                 alumnos, fechas, rubricaCriterios,
                 asignatura: document.getElementById('asignatura').value,
                 curso: document.getElementById('curso').value,
                 docente: document.getElementById('docente').value,
                 regimen: document.getElementById('regimen').value,
                 anio: document.getElementById('anio').value,
-                receso: document.getElementById('receso').value,
                 notaMinima: document.getElementById('notaMinima').value,
                 asistenciaMinima: document.getElementById('asistenciaMinima').value,
                 evalsE1: document.getElementById('evalsEtapa1').value,
                 evalsE2: document.getElementById('evalsEtapa2').value,
                 recups: document.getElementById('recupsPorEval').value,
                 tpsE1: document.getElementById('tpsEtapa1').value,
-                tpsE2: document.getElementById('tpsEtapa2').value
+                tpsE2: document.getElementById('tpsEtapa2').value,
+                fechaInicio: document.getElementById('fechaInicio').value,
+                fechaFin: document.getElementById('fechaFin').value,
+                recesoInicio: document.getElementById('recesoInicio').value,
+                recesoFin: document.getElementById('recesoFin').value,
+                feriados: document.getElementById('feriados').value,
+                diasSeleccionados: Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => cb.value)
             }));
         }
 
         function cargarEstado() {
-            const saved = localStorage.getItem('genAcademico');
+            const saved = localStorage.getItem('genAcademico_v2');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('asignatura').value = data.asignatura || '';
@@ -531,7 +727,6 @@
                 document.getElementById('docente').value = data.docente || '';
                 document.getElementById('regimen').value = data.regimen || '';
                 document.getElementById('anio').value = data.anio || '';
-                document.getElementById('receso').value = data.receso || '';
                 document.getElementById('notaMinima').value = data.notaMinima || 7.0;
                 document.getElementById('asistenciaMinima').value = data.asistenciaMinima || 75;
                 document.getElementById('evalsEtapa1').value = data.evalsE1 || 4;
@@ -539,19 +734,26 @@
                 document.getElementById('recupsPorEval').value = data.recups || 2;
                 document.getElementById('tpsEtapa1').value = data.tpsE1 || 10;
                 document.getElementById('tpsEtapa2').value = data.tpsE2 || 10;
+                if (data.fechaInicio) document.getElementById('fechaInicio').value = data.fechaInicio;
+                if (data.fechaFin) document.getElementById('fechaFin').value = data.fechaFin;
+                if (data.recesoInicio) document.getElementById('recesoInicio').value = data.recesoInicio;
+                if (data.recesoFin) document.getElementById('recesoFin').value = data.recesoFin;
+                if (data.feriados) document.getElementById('feriados').value = data.feriados;
+                // Restaurar checks de días
+                const checks = document.querySelectorAll('#diasSemana input[type="checkbox"]');
+                checks.forEach(cb => { cb.checked = data.diasSeleccionados ? data.diasSeleccionados.includes(cb.value) : (cb.value === '3' || cb.value === '5'); });
                 if (data.alumnos) {
                     document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
                 }
-                if (data.fechas) {
-                    document.getElementById('fechasClase').value = data.fechas.join('\n');
-                }
+                fechas = data.fechas || [];
+                document.getElementById('fechasClase').value = fechas.join('\n');
+                document.getElementById('contadorFechas').textContent = `${fechas.length} fechas generadas`;
                 rubricaCriterios = data.rubricaCriterios || rubricaCriterios;
                 actualizarAlumnos();
-                actualizarFechas();
                 renderizarRubrica();
             } else {
                 actualizarAlumnos();
-                actualizarFechas();
+                generarCronograma(); // genera fechas por defecto
                 renderizarRubrica();
             }
         }
@@ -567,8 +769,7 @@
         });
 
         document.getElementById('listaAlumnos').addEventListener('input', actualizarAlumnos);
-        document.getElementById('fechasClase').addEventListener('input', actualizarFechas);
-        ['asignatura','curso','docente','regimen','anio','receso','notaMinima','asistenciaMinima',
+        ['asignatura','curso','docente','regimen','anio','notaMinima','asistenciaMinima',
          'evalsEtapa1','evalsEtapa2','recupsPorEval','tpsEtapa1','tpsEtapa2'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => {
                 guardarEstado();
