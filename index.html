@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador Dinámico de Libro Excel Académico</title>
-    <!-- xlsx-js-style para soporte de estilos en Excel -->
+    <title>Generador de Excel Académico con Formato Profesional</title>
     <script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
-            --azul-oscuro: #1F4E79;
-            --gris-claro: #F9FAFB;
-            --gris-medio: #E5E7EB;
+            --azul-oscuro: #002060;
+            --gris-claro: #C8C8C8;
+            --gris-muy-claro: #E6E6E6;
             --blanco: #FFFFFF;
-            --verde: #22C55E;
-            --rojo: #EF4444;
-            --naranja: #F97316;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -25,7 +21,7 @@
             line-height: 1.5;
         }
         .app-header {
-            background: linear-gradient(135deg, #1a3a5c, #1F4E79);
+            background: linear-gradient(135deg, #001a30, #002060);
             color: white;
             padding: 16px 28px;
             display: flex;
@@ -60,7 +56,7 @@
         .tab-nav {
             display: flex;
             background: white;
-            border-bottom: 2px solid var(--gris-medio);
+            border-bottom: 2px solid var(--gris-claro);
             position: sticky;
             top: 82px;
             z-index: 99;
@@ -89,7 +85,6 @@
         }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
         label { font-size: 0.8rem; font-weight: 600; color: #4B5563; display: block; margin-bottom: 4px; }
         input, select, textarea {
             width: 100%;
@@ -114,14 +109,8 @@
         .col-b { left: 40px; width: 90px; }
         .col-c { left: 130px; width: 200px; text-align: left; }
         input.cell-input { width: 60px; padding: 4px; border: 1px solid transparent; text-align: center; }
-        input.cell-input:focus { border-color: #2B6BAE; outline: none; background: white; }
         .click-cell { cursor: pointer; padding: 3px 6px; border-radius: 3px; font-weight: 600; }
-        .click-cell.P { color: #059669; background: #D1FAE5; }
-        .click-cell.A { color: #DC2626; background: #FEE2E2; }
-        .click-cell.empty { color: #9CA3AF; }
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #FEE2E2; color: #DC2626; border: none; border-radius: 4px; cursor: pointer; }
         .badge { display: inline-block; background: #E0E7FF; color: #3730A3; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
-        hr { border: 0.5px solid #E5E7EB; margin: 12px 0; }
         .checkbox-group label { display: inline-flex; align-items: center; gap: 4px; margin-right: 12px; font-weight: normal; }
         .checkbox-group input[type="checkbox"] { width: auto; }
     </style>
@@ -129,8 +118,8 @@
 <body>
     <header class="app-header">
         <div>
-            <h1>📐 Generador de Excel Académico (Multi-Asignatura)</h1>
-            <div style="font-size:0.8rem;opacity:0.85;" id="headerSubtitulo">Configurá tu materia y descargá el libro con estilo profesional</div>
+            <h1>📐 Generador de Excel Académico (Formato Profesional)</h1>
+            <div style="font-size:0.8rem;opacity:0.85;">Configurá tu materia y descargá el libro con diseño corporativo</div>
         </div>
         <div>
             <button class="btn btn-upload" onclick="document.getElementById('pdfUpload').click()">📄 Importar Rúbrica desde PDF</button>
@@ -165,25 +154,18 @@
             <div class="card">
                 <h2>👥 Nómina de Alumnos</h2>
                 <p style="font-size:0.8rem; color:#6B7280;">Pegá la lista completa (DNI + Nombre, uno por línea). El sistema separa automáticamente.</p>
-                <textarea id="listaAlumnos" placeholder="50696941 ALMIRA CHOQUE, ALUNEY SURYA&#10;50630692 CARGNELUTTI ADET, FABRICCIO JOAQUIN&#10;...">50696941 ALMIRA CHOQUE, ALUNEY SURYA
+                <textarea id="listaAlumnos" placeholder="50696941 ALMIRA CHOQUE, ALUNEY SURYA&#10;...">50696941 ALMIRA CHOQUE, ALUNEY SURYA
 50630692 CARGNELUTTI ADET, FABRICCIO JOAQUIN
 50935810 CEPEDA CARDOZO, LUCAS TOBIAS
 50628869 CERESO, PIERINA LIBERTAD
 50947860 CHOQUE, SOFÍA MELANI</textarea>
                 <span class="badge" id="contadorAlumnos">5 alumnos cargados</span>
             </div>
-            <!-- NUEVO: Generación automática de fechas -->
             <div class="card">
                 <h2>📅 Cronograma Automático de Clases</h2>
                 <div class="grid-2">
-                    <div>
-                        <label>Fecha de inicio del ciclo</label>
-                        <input type="date" id="fechaInicio" value="2026-03-04">
-                    </div>
-                    <div>
-                        <label>Fecha de fin del ciclo</label>
-                        <input type="date" id="fechaFin" value="2026-12-18">
-                    </div>
+                    <div><label>Fecha de inicio del ciclo</label><input type="date" id="fechaInicio" value="2026-03-04"></div>
+                    <div><label>Fecha de fin del ciclo</label><input type="date" id="fechaFin" value="2026-12-18"></div>
                 </div>
                 <div style="margin-top:12px;">
                     <label>Días de clase</label>
@@ -197,18 +179,12 @@
                     </div>
                 </div>
                 <div class="grid-2" style="margin-top:12px;">
-                    <div>
-                        <label>Receso: fecha inicio</label>
-                        <input type="date" id="recesoInicio" value="2026-07-06">
-                    </div>
-                    <div>
-                        <label>Receso: fecha fin</label>
-                        <input type="date" id="recesoFin" value="2026-07-17">
-                    </div>
+                    <div><label>Receso: fecha inicio</label><input type="date" id="recesoInicio" value="2026-07-06"></div>
+                    <div><label>Receso: fecha fin</label><input type="date" id="recesoFin" value="2026-07-17"></div>
                 </div>
                 <div style="margin-top:12px;">
                     <label>Feriados (una fecha por línea, formato DD/MM/AAAA)</label>
-                    <textarea id="feriados" placeholder="24/03/2026&#10;01/05/2026&#10;25/05/2026&#10;17/06/2026&#10;09/07/2026">24/03/2026
+                    <textarea id="feriados">24/03/2026
 01/05/2026
 25/05/2026
 17/06/2026
@@ -216,7 +192,6 @@
                 </div>
                 <button class="btn btn-generar" onclick="generarCronograma()">🔄 Generar Fechas de Clase</button>
                 <span class="badge" id="contadorFechas" style="margin-left:10px;">0 fechas generadas</span>
-                <!-- Textarea oculto para mantener compatibilidad -->
                 <textarea id="fechasClase" style="display:none;"></textarea>
             </div>
             <div class="card">
@@ -277,7 +252,7 @@
             ['Circuitos','No comprende.','Simples con error.','Correcto.','Optimiza.']
         ];
 
-        // ==================== ACTUALIZACIÓN DE ALUMNOS Y FECHAS ====================
+        // ==================== FUNCIONES DE ACTUALIZACIÓN ====================
         function actualizarAlumnos() {
             const texto = document.getElementById('listaAlumnos').value.trim();
             const lineas = texto.split('\n').filter(l => l.trim() !== '');
@@ -295,48 +270,31 @@
         function generarCronograma() {
             const inicio = new Date(document.getElementById('fechaInicio').value + 'T00:00:00');
             const fin = new Date(document.getElementById('fechaFin').value + 'T00:00:00');
-            if (isNaN(inicio) || isNaN(fin) || inicio > fin) {
-                alert('Fechas inválidas');
-                return;
-            }
-            // Días seleccionados (1=Lun,..,6=Sáb)
-            const diasSeleccionados = [];
-            document.querySelectorAll('#diasSemana input[type="checkbox"]:checked').forEach(cb => {
-                diasSeleccionados.push(parseInt(cb.value));
-            });
-            if (diasSeleccionados.length === 0) {
-                alert('Seleccioná al menos un día de clase');
-                return;
-            }
-            // Receso
+            if (isNaN(inicio) || isNaN(fin) || inicio > fin) { alert('Fechas inválidas'); return; }
+            const diasSeleccionados = Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
+            if (diasSeleccionados.length === 0) { alert('Seleccioná al menos un día de clase'); return; }
             const recIni = new Date(document.getElementById('recesoInicio').value + 'T00:00:00');
             const recFin = new Date(document.getElementById('recesoFin').value + 'T00:00:00');
-            // Feriados (parsear dd/mm/aaaa)
             const feriadosTexto = document.getElementById('feriados').value.trim();
             const feriados = feriadosTexto.split('\n').filter(l => l.trim() !== '').map(l => {
-                const partes = l.trim().split('/');
-                if (partes.length === 3) {
-                    return new Date(partes[2], partes[1]-1, partes[0]);
-                }
+                const p = l.trim().split('/');
+                if (p.length === 3) return new Date(p[2], p[1]-1, p[0]);
                 return null;
             }).filter(d => d && !isNaN(d));
-            // Generar fechas
-            const fechasGeneradas = [];
+            fechas = [];
             const current = new Date(inicio);
             while (current <= fin) {
-                const diaSemana = current.getDay(); // 0=Dom, 1=Lun..6=Sáb
-                // Convertir a índice 1-7 (Lun=1, Dom=7)
+                const diaSemana = current.getDay();
                 const idx = diaSemana === 0 ? 7 : diaSemana;
                 const esDiaClase = diasSeleccionados.includes(idx);
                 const esReceso = current >= recIni && current <= recFin;
                 const esFeriado = feriados.some(f => f.toDateString() === current.toDateString());
                 if (esDiaClase && !esReceso && !esFeriado) {
-                    fechasGeneradas.push(new Date(current));
+                    fechas.push(new Date(current));
                 }
                 current.setDate(current.getDate() + 1);
             }
-            // Formatear a DD/MM/AAAA
-            fechas = fechasGeneradas.map(d => {
+            fechas = fechas.map(d => {
                 const dia = String(d.getDate()).padStart(2,'0');
                 const mes = String(d.getMonth()+1).padStart(2,'0');
                 const anio = d.getFullYear();
@@ -354,9 +312,7 @@
             filas.forEach(tr => {
                 const celdas = tr.querySelectorAll('td');
                 if (celdas.length >= 5) {
-                    const criterio = celdas[0].textContent.trim();
-                    const niveles = [celdas[1].textContent.trim(), celdas[2].textContent.trim(), celdas[3].textContent.trim(), celdas[4].textContent.trim()];
-                    rubricaCriterios.push([criterio, ...niveles]);
+                    rubricaCriterios.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim(), celdas[3].textContent.trim(), celdas[4].textContent.trim()]);
                 }
             });
             guardarEstado();
@@ -368,7 +324,6 @@
             guardarEstado();
         }
 
-        // ==================== PREVISUALIZACIONES ====================
         function renderizarPrevisualizaciones() {
             renderizarAsistencia();
             renderizarTPs();
@@ -380,64 +335,51 @@
             const thead = document.getElementById('theadAsistencia');
             const tbody = document.getElementById('tbodyAsistencia');
             thead.innerHTML = `<tr><th class="sticky-col col-a">Nº</th><th class="sticky-col col-b">DNI</th><th class="sticky-col col-c">Alumno</th>${fechas.map(f => `<th>${f.slice(0,5)}</th>`).join('')}<th>% Asist.</th></tr>`;
-            tbody.innerHTML = alumnos.map((a,i) => {
-                const pct = 100; // placeholder
-                return `<tr>
-                    <td class="sticky-col col-a">${i+1}</td>
-                    <td class="sticky-col col-b">${a.dni}</td>
-                    <td class="sticky-col col-c">${a.nombre}</td>
-                    ${fechas.map(() => `<td class="click-cell empty">-</td>`).join('')}
-                    <td>100%</td>
-                </tr>`;
-            }).join('');
+            tbody.innerHTML = alumnos.map((a,i) => `<tr>
+                <td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>
+                ${fechas.map(() => `<td class="click-cell empty">-</td>`).join('')}<td>100%</td></tr>`).join('');
         }
 
         function renderizarTPs() {
-            const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value) || 10;
-            const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value) || 10;
-            const totalTPs = tpsE1 + tpsE2;
+            const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value)||10;
+            const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value)||10;
+            const totalTPs = tpsE1+tpsE2;
             const thead = document.getElementById('theadTPs');
             const tbody = document.getElementById('tbodyTPs');
-            let htmlHead = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
-            if (tpsE1 > 0) htmlHead += `<th colspan="${tpsE1}">Etapa 1</th>`;
-            if (tpsE2 > 0) htmlHead += `<th colspan="${tpsE2}">Etapa 2</th>`;
-            htmlHead += `<th rowspan="2">Promedio</th></tr><tr>`;
-            for (let i=1; i<=tpsE1; i++) htmlHead += `<th>TP${i}</th>`;
-            for (let i=1; i<=tpsE2; i++) htmlHead += `<th>TP${tpsE1+i}</th>`;
-            htmlHead += `</tr>`;
-            thead.innerHTML = htmlHead;
+            let html = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
+            if(tpsE1>0) html += `<th colspan="${tpsE1}">Etapa 1</th>`;
+            if(tpsE2>0) html += `<th colspan="${tpsE2}">Etapa 2</th>`;
+            html += `<th rowspan="2">Prom.</th></tr><tr>`;
+            for(let i=1; i<=tpsE1; i++) html += `<th>TP${i}</th>`;
+            for(let i=1; i<=tpsE2; i++) html += `<th>TP${tpsE1+i}</th>`;
+            html += `</tr>`;
+            thead.innerHTML = html;
             tbody.innerHTML = alumnos.map((a,i) => {
                 let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
-                for (let j=0; j<totalTPs; j++) row += `<td><input class="cell-input" type="number" step="0.1" value=""></td>`;
+                for(let j=0; j<totalTPs; j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
                 row += `<td>-</td>`;
                 return `<tr>${row}</tr>`;
             }).join('');
         }
 
         function renderizarNotas() {
-            const evalsE1 = parseInt(document.getElementById('evalsEtapa1').value) || 4;
-            const evalsE2 = parseInt(document.getElementById('evalsEtapa2').value) || 4;
-            const recups = parseInt(document.getElementById('recupsPorEval').value) || 2;
-            const totalEvals = evalsE1 + evalsE2;
+            const evalsE1 = parseInt(document.getElementById('evalsEtapa1').value)||4;
+            const evalsE2 = parseInt(document.getElementById('evalsEtapa2').value)||4;
+            const recups = parseInt(document.getElementById('recupsPorEval').value)||2;
+            const totalEvals = evalsE1+evalsE2;
             const thead = document.getElementById('theadNotas');
             const tbody = document.getElementById('tbodyNotas');
-            let htmlHead = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
-            if (evalsE1 > 0) htmlHead += `<th colspan="${evalsE1 * (1+recups)}">Etapa 1</th>`;
-            if (evalsE2 > 0) htmlHead += `<th colspan="${evalsE2 * (1+recups)}">Etapa 2</th>`;
-            htmlHead += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
-            for (let e=1; e<=evalsE1; e++) {
-                htmlHead += `<th>Eval${e}</th>`;
-                for (let r=1; r<=recups; r++) htmlHead += `<th>Rec${r}</th>`;
-            }
-            for (let e=1; e<=evalsE2; e++) {
-                htmlHead += `<th>Eval${evalsE1+e}</th>`;
-                for (let r=1; r<=recups; r++) htmlHead += `<th>Rec${r}</th>`;
-            }
-            htmlHead += `</tr>`;
-            thead.innerHTML = htmlHead;
+            let html = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
+            if(evalsE1>0) html += `<th colspan="${evalsE1*(1+recups)}">Etapa 1</th>`;
+            if(evalsE2>0) html += `<th colspan="${evalsE2*(1+recups)}">Etapa 2</th>`;
+            html += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
+            for(let e=1; e<=evalsE1; e++) { html += `<th>Ev${e}</th>`; for(let r=1; r<=recups; r++) html += `<th>Rec${r}</th>`; }
+            for(let e=1; e<=evalsE2; e++) { html += `<th>Ev${evalsE1+e}</th>`; for(let r=1; r<=recups; r++) html += `<th>Rec${r}</th>`; }
+            html += `</tr>`;
+            thead.innerHTML = html;
             tbody.innerHTML = alumnos.map((a,i) => {
                 let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
-                for (let j=0; j<totalEvals*(1+recups); j++) row += `<td><input class="cell-input" type="number" step="0.1" value=""></td>`;
+                for(let j=0; j<totalEvals*(1+recups); j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
                 row += `<td>-</td><td>-</td>`;
                 return `<tr>${row}</tr>`;
             }).join('');
@@ -445,21 +387,13 @@
 
         function renderizarRubrica() {
             const tbody = document.getElementById('tbodyRubrica');
-            tbody.innerHTML = rubricaCriterios.map(c => `
-                <tr>
-                    <td contenteditable="true" style="text-align:left;font-weight:600;">${c[0]}</td>
-                    <td contenteditable="true" class="nivel-insuficiente">${c[1]}</td>
-                    <td contenteditable="true" class="nivel-regular">${c[2]}</td>
-                    <td contenteditable="true" class="nivel-bueno">${c[3]}</td>
-                    <td contenteditable="true" class="nivel-excelente">${c[4]}</td>
-                </tr>
-            `).join('');
-            document.querySelectorAll('#tbodyRubrica td[contenteditable]').forEach(td => {
-                td.addEventListener('blur', actualizarRubricaDesdeTabla);
-            });
+            tbody.innerHTML = rubricaCriterios.map(c => `<tr>
+                <td contenteditable="true" style="text-align:left;font-weight:600;">${c[0]}</td>
+                <td contenteditable="true">${c[1]}</td><td contenteditable="true">${c[2]}</td>
+                <td contenteditable="true">${c[3]}</td><td contenteditable="true">${c[4]}</td></tr>`).join('');
+            document.querySelectorAll('#tbodyRubrica td[contenteditable]').forEach(td => td.addEventListener('blur', actualizarRubricaDesdeTabla));
         }
 
-        // ==================== PDF IMPORT ====================
         function procesarPDF(input) {
             if (input.files.length === 0) return;
             const file = input.files[0];
@@ -471,71 +405,91 @@
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    const pageText = content.items.map(item => item.str).join(' ');
-                    textoCompleto += pageText + '\n';
+                    textoCompleto += content.items.map(item => item.str).join(' ') + '\n';
                 }
                 const lineas = textoCompleto.split('\n').filter(l => l.trim().length > 10);
-                rubricaCriterios = lineas.slice(0, 4).map((l, idx) => {
+                rubricaCriterios = lineas.slice(0,4).map((l,idx) => {
                     const partes = l.split(/[\.;]\s*/);
-                    return [
-                        partes[0] || `Criterio ${idx+1}`,
-                        partes[1] || 'Insuficiente',
-                        partes[2] || 'Regular',
-                        partes[3] || 'Bueno',
-                        partes[4] || 'Excelente'
-                    ];
+                    return [partes[0]||`Criterio ${idx+1}`, partes[1]||'Insuficiente', partes[2]||'Regular', partes[3]||'Bueno', partes[4]||'Excelente'];
                 });
-                if (rubricaCriterios.length === 0) rubricaCriterios = [['Extraído', 'Texto', 'del', 'PDF', 'completar']];
-                renderizarRubrica();
-                guardarEstado();
-                alert('Rúbrica importada desde PDF. Revisá y editá si es necesario.');
+                if (rubricaCriterios.length===0) rubricaCriterios = [['Extraído','Texto','del','PDF','completar']];
+                renderizarRubrica(); guardarEstado();
+                alert('Rúbrica importada. Revisá y editá si es necesario.');
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // ==================== GENERACIÓN DE EXCEL CON FORMATO ====================
-        function aplicarEstiloCelda(cell, tipo, valor) {
-            // Estilos base
-            cell.s = {
-                font: { name: 'Segoe UI', sz: 10, bold: false, color: { rgb: "1F2937" } },
-                fill: { fgColor: { rgb: "FFFFFF" } },
+        // ==================== GENERACIÓN DE EXCEL CON FORMATO PROFESIONAL ====================
+        const AZUL_OSCURO = '002060';
+        const GRIS_CLARO = 'C8C8C8';
+        const GRIS_MUY_CLARO = 'E6E6E6';
+        const BLANCO = 'FFFFFF';
+        const AMARILLO_CLARO = 'FFFFCC';
+
+        function estiloCelda(tipo) {
+            const base = {
+                font: { name: 'Calibri', sz: 11, bold: false, color: { rgb: '000000' } },
+                fill: { fgColor: { rgb: BLANCO } },
                 alignment: { vertical: 'center', horizontal: 'center', wrapText: false },
                 border: {
-                    top: { style: 'thin', color: { rgb: 'D1D5DB' } },
-                    bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
-                    left: { style: 'thin', color: { rgb: 'D1D5DB' } },
-                    right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+                    top: { style: 'thin', color: { rgb: '000000' } },
+                    bottom: { style: 'thin', color: { rgb: '000000' } },
+                    left: { style: 'thin', color: { rgb: '000000' } },
+                    right: { style: 'thin', color: { rgb: '000000' } }
                 }
             };
-            if (tipo === 'header') {
-                cell.s.font = { name: 'Segoe UI', sz: 9, bold: true, color: { rgb: "FFFFFF" } };
-                cell.s.fill = { fgColor: { rgb: "1F4E79" } };
-            } else if (tipo === 'subheader') {
-                cell.s.font = { name: 'Segoe UI', sz: 8, bold: true, color: { rgb: "FFFFFF" } };
-                cell.s.fill = { fgColor: { rgb: "2B6BAE" } };
-            } else if (tipo === 'data') {
-                cell.s.fill = { fgColor: { rgb: "FFFFFF" } };
-            } else if (tipo === 'data-alt') {
-                cell.s.fill = { fgColor: { rgb: "F9FAFB" } };
+            switch (tipo) {
+                case 'titulo':
+                    base.font = { name: 'Calibri', sz: 14, bold: true, color: { rgb: 'FFFFFF' } };
+                    base.fill = { fgColor: { rgb: AZUL_OSCURO } };
+                    base.alignment.horizontal = 'center';
+                    break;
+                case 'subtitulo':
+                    base.font = { name: 'Calibri', sz: 11, bold: true, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: GRIS_CLARO } };
+                    break;
+                case 'cabecera':
+                    base.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: GRIS_MUY_CLARO } };
+                    break;
+                case 'dato':
+                    base.font = { name: 'Calibri', sz: 10, bold: false, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: BLANCO } };
+                    break;
+                case 'dato_alt':
+                    base.font = { name: 'Calibri', sz: 10, bold: false, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: 'F9FAFB' } };
+                    break;
+                case 'metrica_label':
+                    base.font = { name: 'Calibri', sz: 12, bold: true, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: GRIS_CLARO } };
+                    break;
+                case 'nota_final':
+                    base.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '000000' } };
+                    base.fill = { fgColor: { rgb: AMARILLO_CLARO } };
+                    break;
+                default: break;
             }
-            // Formato numérico
+            return JSON.parse(JSON.stringify(base));
+        }
+
+        function aplicarEstilo(ws, celda, tipo, valor) {
+            if (!ws[celda]) ws[celda] = { v: '' };
+            ws[celda].s = estiloCelda(tipo);
             if (typeof valor === 'number' && !isNaN(valor)) {
-                cell.t = 'n';
-                cell.v = valor;
-                cell.s.numFmt = '0.0';
+                ws[celda].t = 'n'; ws[celda].v = valor;
+                ws[celda].s.numFmt = '0.0';
             } else if (valor && typeof valor === 'object' && valor.f) {
-                cell.t = 'n';
-                cell.f = valor.f;
-                cell.s.numFmt = '0.0';
+                ws[celda].t = 'n'; ws[celda].f = valor.f;
+                ws[celda].s.numFmt = '0.0';
+            } else {
+                ws[celda].v = valor || '';
             }
         }
 
         function descargarExcel() {
             actualizarAlumnos();
-            if (fechas.length === 0) {
-                alert('Primero generá el cronograma de fechas.');
-                return;
-            }
+            if (fechas.length === 0) { alert('Primero generá el cronograma de fechas.'); return; }
             const sep = document.getElementById('separadorFormulas').value;
             const notaMin = parseFloat(document.getElementById('notaMinima').value);
             const asistMin = parseInt(document.getElementById('asistenciaMinima').value);
@@ -547,147 +501,237 @@
             const totalEvals = evalsE1 + evalsE2;
             const totalTPs = tpsE1 + tpsE2;
             const colsPorEval = 1 + recups;
-
             const wb = XLSX.utils.book_new();
 
-            // ----- DASHBOARD -----
+            // ---------- DASHBOARD ----------
             const dashData = [
-                ['SEGUIMIENTO ACADÉMICO', '', '', ''],
-                ['Asignatura:', document.getElementById('asignatura').value, 'Curso:', document.getElementById('curso').value],
-                ['Docente:', document.getElementById('docente').value, 'Régimen:', document.getElementById('regimen').value],
-                ['Año:', document.getElementById('anio').value, 'Nota mínima:', notaMin],
-                ['Asistencia mínima:', asistMin + '%', 'Receso:', document.getElementById('recesoInicio').value + ' al ' + document.getElementById('recesoFin').value],
-                ['', '', '', ''],
-                ['MÉTRICAS', '', '', ''],
-                ['Total Alumnos', alumnos.length, '', ''],
-                ['Promedio General', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}, '', ''],
-                ['Asistencia Promedio', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}, '', ''],
-                ['', '', '', ''],
-                ['RESUMEN DE CONDICIONES', '', '', ''],
-                ['Aprobados', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Aprobado")`}, '', ''],
-                ['Libres por Nota', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Nota")`}, '', ''],
-                ['Libres por Asistencia', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Asistencia")`}, '', '']
+                ['SEGUIMIENTO ACADÉMICO', '', ''],
+                ['Asignatura:', document.getElementById('asignatura').value, ''],
+                ['Curso:', document.getElementById('curso').value, ''],
+                ['Docente:', document.getElementById('docente').value, ''],
+                ['Régimen:', document.getElementById('regimen').value, ''],
+                ['Año:', document.getElementById('anio').value, ''],
+                ['Nota mínima:', notaMin, ''],
+                ['Asistencia mínima:', asistMin + '%', ''],
+                ['', '', ''],
+                ['Métrica de Gestión', 'Valor Actual', ''],
+                ['Total de Alumnos', alumnos.length, ''],
+                ['Promedio General del Curso', {f: `PROMEDIO(Notas!${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(3+totalEvals*colsPorEval)}${5+alumnos.length})`}, ''],
+                ['Asistencia Promedio del Ciclo', {f: `PROMEDIO(Asistencia!${XLSX.utils.encode_col(3+fechas.length)}6:${XLSX.utils.encode_col(3+fechas.length)}${5+alumnos.length})`}, ''],
+                ['', '', ''],
+                ['Estado / Condición Final', 'Cantidad Alumnos', ''],
+                ['Aprobado', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Aprobado")`}, ''],
+                ['Libre por Nota', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Nota")`}, ''],
+                ['Libre por Asistencia', {f: `CONTAR.SI(Notas!${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}6:${XLSX.utils.encode_col(4+totalEvals*colsPorEval)}${5+alumnos.length};"Libre por Asistencia")`}, '']
             ];
             const wsDash = XLSX.utils.aoa_to_sheet(dashData);
-            // Estilos para Dashboard (solo encabezados)
+            wsDash['!merges'] = [{s:{r:0,c:0},e:{r:0,c:2}}];
             for (let R = 0; R < dashData.length; R++) {
                 for (let C = 0; C < dashData[R].length; C++) {
                     const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    if (!wsDash[cellRef]) wsDash[cellRef] = {v: ''};
-                    aplicarEstiloCelda(wsDash[cellRef], R === 0 ? 'header' : 'data', dashData[R][C]);
+                    let tipo = 'dato';
+                    if (R === 0) tipo = 'titulo';
+                    else if (R === 9 || R === 14) tipo = 'metrica_label';
+                    aplicarEstilo(wsDash, cellRef, tipo, dashData[R][C]);
                 }
             }
-            wsDash['!merges'] = [{s:{r:0,c:0},e:{r:0,c:3}}];
+            wsDash['!cols'] = [{wch:30}, {wch:20}, {wch:10}];
+            wsDash['!rows'] = [{hpx:35}, {hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:20},{hpx:5},{hpx:25},{hpx:20},{hpx:20},{hpx:20},{hpx:5},{hpx:25},{hpx:20},{hpx:20},{hpx:20}];
             XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
 
-            // ----- ASISTENCIA -----
-            const asisHeader = ['Nº', 'DNI', 'Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
+            // ---------- ASISTENCIA ----------
+            const ultColAsis = 3 + fechas.length; // columnas A, B, C + fechas + %Asistencia = índice de %Asistencia
+            const colLetraUltAsis = XLSX.utils.encode_col(ultColAsis);
+            const asisHeader = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
             const asisRows = [asisHeader];
             alumnos.forEach((a,i) => {
                 const row = [i+1, a.dni, a.nombre, ...fechas.map(() => '')];
-                const colAsis = XLSX.utils.encode_col(3+fechas.length);
-                const fila = i+2;
-                row.push({f: `SI(CONTARA(D${fila}:${colAsis}${fila})>0${sep}CONTAR.SI(D${fila}:${colAsis}${fila}${sep}"P")/CONTARA(D${fila}:${colAsis}${fila})${sep}0)`});
+                const fila = i+2; // filas en Excel: 1=título, 2=vacía, 3=subtítulo, 4=cabecera, 5=vacía, 6=datos
+                row.push({f: `SI(CONTARA(D${fila}:${colLetraUltAsis}${fila})>0${sep}CONTAR.SI(D${fila}:${colLetraUltAsis}${fila}${sep}"P")/CONTARA(D${fila}:${colLetraUltAsis}${fila})${sep}0)`});
                 asisRows.push(row);
             });
             const wsAsis = XLSX.utils.aoa_to_sheet(asisRows);
-            for (let R = 0; R < asisRows.length; R++) {
-                for (let C = 0; C < asisRows[R].length; C++) {
-                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    if (!wsAsis[cellRef]) wsAsis[cellRef] = {v: ''};
-                    const tipo = R === 0 ? 'header' : (R % 2 === 0 ? 'data-alt' : 'data');
-                    aplicarEstiloCelda(wsAsis[cellRef], tipo, asisRows[R][C]);
-                    if (C >= 3 + fechas.length) wsAsis[cellRef].s.numFmt = '0%';
-                }
+            // Insertar filas de título y subtítulos reales (desplazar datos)
+            // Vamos a reconstruir la hoja manualmente para incluir las filas de formato
+            const newAsis = {};
+            // Fila 1: título
+            newAsis['A1'] = { v: 'REGISTRO ANUAL DE ASISTENCIA', s: estiloCelda('titulo') };
+            // Fila 2 vacía
+            // Fila 3: subtítulos
+            newAsis['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
+            newAsis['D3'] = { v: 'REGISTRO DE ASISTENCIA DIARIA', s: estiloCelda('subtitulo') };
+            newAsis[`${colLetraUltAsis}3`] = { v: 'MÉTRICA', s: estiloCelda('subtitulo') };
+            // Fila 4: cabeceras
+            asisHeader.forEach((h, idx) => {
+                const cellRef = XLSX.utils.encode_cell({r:3, c:idx}); // fila 4
+                newAsis[cellRef] = { v: h, s: estiloCelda('cabecera') };
+            });
+            // Filas de datos desde fila 5 (índice 4) hacia abajo
+            for (let i = 0; i < alumnos.length; i++) {
+                const rowData = [i+1, alumnos[i].dni, alumnos[i].nombre, ...fechas.map(() => '')];
+                const filaExcel = i + 5; // fila 5 en adelante
+                rowData.forEach((val, c) => {
+                    const cellRef = XLSX.utils.encode_cell({r: filaExcel-1, c});
+                    newAsis[cellRef] = { v: val || '', s: estiloCelda('dato') };
+                });
+                // Fórmula % Asistencia
+                const cellRefPct = XLSX.utils.encode_cell({r: filaExcel-1, c: ultColAsis});
+                newAsis[cellRefPct] = { f: `SI(CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})>0${sep}CONTAR.SI(D${filaExcel}:${colLetraUltAsis}${filaExcel}${sep}"P")/CONTARA(D${filaExcel}:${colLetraUltAsis}${filaExcel})${sep}0)`, t: 'n', s: { ...estiloCelda('dato'), numFmt: '0%' } };
             }
-            wsAsis['!freeze'] = {xSplit:3, ySplit:1};
+            // Merges
+            newAsis['!merges'] = [
+                {s:{r:0,c:0}, e:{r:0,c:ultColAsis}},
+                {s:{r:2,c:0}, e:{r:2,c:2}},
+                {s:{r:2,c:3}, e:{r:2,c:ultColAsis-1}},
+                {s:{r:2,c:ultColAsis}, e:{r:2,c:ultColAsis}}
+            ];
+            newAsis['!cols'] = [{wch:5},{wch:12},{wch:30}, ...fechas.map(() => ({wch:5})), {wch:10}];
+            newAsis['!rows'] = [{hpx:40}, {hpx:5}, {hpx:25}, {hpx:22}];
+            for (let i = 0; i < alumnos.length; i++) newAsis['!rows'].push({hpx:15});
+            newAsis['!freeze'] = { xSplit: 3, ySplit: 4 }; // Congelar en D5
+            wsAsis['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:4+alumnos.length-1, c:ultColAsis}});
+            Object.assign(wsAsis, newAsis);
             XLSX.utils.book_append_sheet(wb, wsAsis, "Asistencia");
 
-            // ----- TPs -----
-            const tpsHeader = ['Nº', 'DNI', 'Nombre', ...Array.from({length:totalTPs}, (_,i) => `TP${i+1}`), 'Promedio'];
-            const tpsRows = [tpsHeader];
-            alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre, ...Array(totalTPs).fill('')];
-                const colFinTP = XLSX.utils.encode_col(3+totalTPs);
-                row.push({f: `PROMEDIO(D${i+2}:${colFinTP}${i+2})`});
-                tpsRows.push(row);
+            // ---------- TRABAJOS PRÁCTICOS ----------
+            const ultColTPs = 3 + totalTPs; // columna de Promedio
+            const colLetraUltTP = XLSX.utils.encode_col(ultColTPs);
+            const wsTPs = {};
+            // Fila 1 título
+            wsTPs['A1'] = { v: 'SEGUIMIENTO DE TRABAJOS PRÁCTICOS', s: estiloCelda('titulo') };
+            // Fila 3 subtítulos
+            wsTPs['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
+            if (tpsE1 > 0) wsTPs[`D3`] = { v: 'ETAPA 1 (TP 1 - TP ' + tpsE1 + ')', s: estiloCelda('subtitulo') };
+            if (tpsE2 > 0) wsTPs[`${XLSX.utils.encode_col(3+tpsE1)}3`] = { v: 'ETAPA 2 (TP ' + (tpsE1+1) + ' - TP ' + totalTPs + ')', s: estiloCelda('subtitulo') };
+            wsTPs[`${colLetraUltTP}3`] = { v: 'PROMEDIO', s: estiloCelda('subtitulo') };
+            // Fila 4 cabeceras
+            const tpsCabeceras = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
+            tpsCabeceras.forEach((h, idx) => {
+                wsTPs[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
             });
-            const wsTPs = XLSX.utils.aoa_to_sheet(tpsRows);
-            for (let R = 0; R < tpsRows.length; R++) {
-                for (let C = 0; C < tpsRows[R].length; C++) {
-                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    if (!wsTPs[cellRef]) wsTPs[cellRef] = {v: ''};
-                    aplicarEstiloCelda(wsTPs[cellRef], R === 0 ? 'header' : (R%2===0?'data-alt':'data'), tpsRows[R][C]);
+            // Datos desde fila 5
+            for (let i = 0; i < alumnos.length; i++) {
+                const fila = i + 5;
+                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
+                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
+                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
+                for (let j = 0; j < totalTPs; j++) {
+                    wsTPs[XLSX.utils.encode_cell({r:fila-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
                 }
+                wsTPs[XLSX.utils.encode_cell({r:fila-1, c:ultColTPs})] = { f: `PROMEDIO(D${fila}:${colLetraUltTP}${fila})`, t: 'n', s: { ...estiloCelda('dato'), numFmt: '0.0' } };
             }
-            XLSX.utils.book_append_sheet(wb, wsTPs, "TPs");
+            wsTPs['!merges'] = [
+                {s:{r:0,c:0}, e:{r:0,c:ultColTPs}},
+                {s:{r:2,c:0}, e:{r:2,c:2}}
+            ];
+            if (tpsE1 > 0) wsTPs['!merges'].push({s:{r:2,c:3}, e:{r:2,c:3+tpsE1-1}});
+            if (tpsE2 > 0) wsTPs['!merges'].push({s:{r:2,c:3+tpsE1}, e:{r:2,c:3+totalTPs-1}});
+            wsTPs['!merges'].push({s:{r:2,c:ultColTPs}, e:{r:2,c:ultColTPs}});
+            wsTPs['!cols'] = [{wch:5},{wch:12},{wch:30}, ...Array(totalTPs).fill({wch:6}), {wch:10}];
+            wsTPs['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:22}];
+            for (let i=0; i<alumnos.length; i++) wsTPs['!rows'].push({hpx:15});
+            wsTPs['!freeze'] = { xSplit: 3, ySplit: 4 };
+            wsTPs['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:4+alumnos.length-1, c:ultColTPs}});
+            XLSX.utils.book_append_sheet(wb, wsTPs, "Trabajos Prácticos");
 
-            // ----- NOTAS -----
-            const notasHeader1 = ['Nº', 'DNI', 'Nombre'];
-            const notasHeader2 = ['', '', ''];
-            for (let e=0; e<totalEvals; e++) {
-                notasHeader1.push(`Eval${e+1}`, ...Array(recups).fill(''));
-                notasHeader2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
-            }
-            notasHeader1.push('Nota Final', 'Estado');
-            notasHeader2.push('', '');
-            const notasRows = [notasHeader1, notasHeader2];
+            // ---------- NOTAS ----------
             const colNotaFinal = 3 + totalEvals * colsPorEval;
             const colEstado = colNotaFinal + 1;
-            alumnos.forEach((a,i) => {
-                const row = [i+1, a.dni, a.nombre, ...Array(totalEvals*colsPorEval).fill('')];
-                const fila = i+3;
-                let formula = '=PROMEDIO(';
+            const colLetraNF = XLSX.utils.encode_col(colNotaFinal);
+            const colLetraEst = XLSX.utils.encode_col(colEstado);
+            const wsNotas = {};
+            wsNotas['A1'] = { v: 'CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES', s: estiloCelda('titulo') };
+            // Fila 3 subtítulos
+            wsNotas['A3'] = { v: 'DATOS DEL ALUMNO', s: estiloCelda('subtitulo') };
+            if (evalsE1 > 0) wsNotas[`D3`] = { v: 'EVALUACIONES - ETAPA 1', s: estiloCelda('subtitulo') };
+            if (evalsE2 > 0) wsNotas[`${XLSX.utils.encode_col(3+evalsE1*colsPorEval)}3`] = { v: 'EVALUACIONES - ETAPA 2', s: estiloCelda('subtitulo') };
+            wsNotas[`${colLetraNF}3`] = { v: 'RESULTADOS FINALES', s: estiloCelda('subtitulo') };
+            // Fila 4 cabeceras
+            const cabNotas = ['Nº', 'DNI', 'Apellido y Nombre'];
+            for (let e=1; e<=totalEvals; e++) {
+                cabNotas.push(`Ev${e}`, ...Array(recups).fill(''));
+            }
+            cabNotas.push('Nota Final', 'Estado Académico');
+            const cabNotas2 = ['', '', ''];
+            for (let e=1; e<=totalEvals; e++) {
+                cabNotas2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
+            }
+            cabNotas2.push('', '');
+            // Insertar fila 4 con cabNotas y fila 5 con cabNotas2
+            cabNotas.forEach((h, idx) => {
+                wsNotas[XLSX.utils.encode_cell({r:3, c:idx})] = { v: h, s: estiloCelda('cabecera') };
+            });
+            cabNotas2.forEach((h, idx) => {
+                wsNotas[XLSX.utils.encode_cell({r:4, c:idx})] = { v: h, s: estiloCelda('cabecera') };
+            });
+            // Datos desde fila 6
+            for (let i = 0; i < alumnos.length; i++) {
+                const fila = i + 6;
+                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:0})] = { v: i+1, s: estiloCelda('dato') };
+                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:1})] = { v: alumnos[i].dni, s: estiloCelda('dato') };
+                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:2})] = { v: alumnos[i].nombre, s: { ...estiloCelda('dato'), alignment: { horizontal: 'left' } } };
+                for (let j=0; j<totalEvals*colsPorEval; j++) {
+                    wsNotas[XLSX.utils.encode_cell({r:fila-1, c:3+j})] = { v: '', s: estiloCelda('dato') };
+                }
+                // Nota Final
+                let formulaNF = '=PROMEDIO(';
                 const partes = [];
                 for (let e=0; e<totalEvals; e++) {
                     const colIni = 3 + e*colsPorEval;
                     const colFin = colIni + recups;
                     partes.push(`MAX(${XLSX.utils.encode_col(colIni)}${fila}:${XLSX.utils.encode_col(colFin)}${fila})`);
                 }
-                formula += partes.join(sep) + ')';
-                row.push({f: formula});
+                formulaNF += partes.join(sep) + ')';
+                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colNotaFinal})] = { f: formulaNF, t: 'n', s: estiloCelda('nota_final') };
+                // Estado
                 const colAsisRef = XLSX.utils.encode_col(3+fechas.length);
-                row.push({f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${XLSX.utils.encode_col(colNotaFinal)}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`});
-                notasRows.push(row);
-            });
-            const wsNotas = XLSX.utils.aoa_to_sheet(notasRows);
-            // Estilos
-            for (let R = 0; R < notasRows.length; R++) {
-                for (let C = 0; C < notasRows[R].length; C++) {
-                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    if (!wsNotas[cellRef]) wsNotas[cellRef] = {v: ''};
-                    let tipo = 'data';
-                    if (R === 0) tipo = 'header';
-                    else if (R === 1) tipo = 'subheader';
-                    else if (R % 2 === 0) tipo = 'data-alt';
-                    aplicarEstiloCelda(wsNotas[cellRef], tipo, notasRows[R][C]);
-                }
+                wsNotas[XLSX.utils.encode_cell({r:fila-1, c:colEstado})] = {
+                    f: `SI(Asistencia!${colAsisRef}${fila}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetraNF}${fila}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`,
+                    t: 's', s: estiloCelda('dato')
+                };
             }
-            // Merges para encabezados de etapa
+            // Merges
             wsNotas['!merges'] = [
-                {s:{r:0,c:0},e:{r:1,c:0}}, {s:{r:0,c:1},e:{r:1,c:1}}, {s:{r:0,c:2},e:{r:1,c:2}},
-                {s:{r:0,c:colNotaFinal},e:{r:1,c:colNotaFinal}}, {s:{r:0,c:colEstado},e:{r:1,c:colEstado}}
+                {s:{r:0,c:0}, e:{r:0,c:colEstado}},
+                {s:{r:2,c:0}, e:{r:2,c:2}},
+                {s:{r:2,c:colNotaFinal}, e:{r:2,c:colEstado}},
+                {s:{r:3,c:0}, e:{r:4,c:0}},
+                {s:{r:3,c:1}, e:{r:4,c:1}},
+                {s:{r:3,c:2}, e:{r:4,c:2}},
+                {s:{r:3,c:colNotaFinal}, e:{r:4,c:colNotaFinal}},
+                {s:{r:3,c:colEstado}, e:{r:4,c:colEstado}}
             ];
-            if (evalsE1 > 0) {
-                wsNotas['!merges'].push({s:{r:0,c:3},e:{r:0,c:3+evalsE1*colsPorEval-1}});
+            if (evalsE1 > 0) wsNotas['!merges'].push({s:{r:2,c:3}, e:{r:2,c:3+evalsE1*colsPorEval-1}});
+            if (evalsE2 > 0) wsNotas['!merges'].push({s:{r:2,c:3+evalsE1*colsPorEval}, e:{r:2,c:colNotaFinal-1}});
+            for (let e=0; e<totalEvals; e++) {
+                wsNotas['!merges'].push({s:{r:3,c:3+e*colsPorEval}, e:{r:3,c:3+(e+1)*colsPorEval-1}});
             }
-            if (evalsE2 > 0) {
-                wsNotas['!merges'].push({s:{r:0,c:3+evalsE1*colsPorEval},e:{r:0,c:3+totalEvals*colsPorEval-1}});
-            }
-            wsNotas['!freeze'] = {xSplit:3, ySplit:2};
+            wsNotas['!cols'] = [{wch:5},{wch:12},{wch:30}, ...Array(totalEvals*colsPorEval).fill({wch:6}), {wch:11},{wch:18}];
+            wsNotas['!rows'] = [{hpx:40},{hpx:5},{hpx:25},{hpx:30},{hpx:22}];
+            for (let i=0; i<alumnos.length; i++) wsNotas['!rows'].push({hpx:15});
+            wsNotas['!freeze'] = { xSplit: 3, ySplit: 5 };
+            wsNotas['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:5+alumnos.length-1, c:colEstado}});
             XLSX.utils.book_append_sheet(wb, wsNotas, "Notas");
 
-            // ----- RÚBRICA -----
+            // ---------- RÚBRICA ----------
             actualizarRubricaDesdeTabla();
-            const rubData = [['Criterio', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'], ...rubricaCriterios];
-            const wsRub = XLSX.utils.aoa_to_sheet(rubData);
-            for (let R = 0; R < rubData.length; R++) {
-                for (let C = 0; C < rubData[R].length; C++) {
-                    const cellRef = XLSX.utils.encode_cell({r:R, c:C});
-                    if (!wsRub[cellRef]) wsRub[cellRef] = {v: ''};
-                    aplicarEstiloCelda(wsRub[cellRef], R === 0 ? 'header' : 'data', rubData[R][C]);
-                }
-            }
+            const wsRub = {};
+            wsRub['A1'] = { v: 'MATRIZ DE EVALUACIÓN DE COMPETENCIAS', s: estiloCelda('titulo') };
+            const rubCab = ['Criterio de Evaluación', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'];
+            rubCab.forEach((h, idx) => {
+                wsRub[XLSX.utils.encode_cell({r:2, c:idx})] = { v: h, s: estiloCelda('subtitulo') };
+            });
+            rubricaCriterios.forEach((criterio, i) => {
+                criterio.forEach((texto, j) => {
+                    const cellRef = XLSX.utils.encode_cell({r:3+i, c:j});
+                    wsRub[cellRef] = { v: texto, s: { ...estiloCelda('dato'), alignment: { horizontal: j===0 ? 'left' : 'center', vertical: 'center', wrapText: true } } };
+                });
+            });
+            wsRub['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:4}}];
+            wsRub['!cols'] = [{wch:35},{wch:20},{wch:20},{wch:25},{wch:25}];
+            wsRub['!rows'] = [{hpx:35},{hpx:5},{hpx:25}];
+            for (let i=0; i<rubricaCriterios.length; i++) wsRub['!rows'].push({hpx:45});
+            wsRub['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:3+rubricaCriterios.length-1, c:4}});
             XLSX.utils.book_append_sheet(wb, wsRub, "Rúbrica");
 
             XLSX.writeFile(wb, `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`);
@@ -695,7 +739,7 @@
 
         // ==================== GUARDADO Y NAVEGACIÓN ====================
         function guardarEstado() {
-            localStorage.setItem('genAcademico_v2', JSON.stringify({
+            localStorage.setItem('genAcademico_v3', JSON.stringify({
                 alumnos, fechas, rubricaCriterios,
                 asignatura: document.getElementById('asignatura').value,
                 curso: document.getElementById('curso').value,
@@ -719,7 +763,7 @@
         }
 
         function cargarEstado() {
-            const saved = localStorage.getItem('genAcademico_v2');
+            const saved = localStorage.getItem('genAcademico_v3');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('asignatura').value = data.asignatura || '';
@@ -739,12 +783,9 @@
                 if (data.recesoInicio) document.getElementById('recesoInicio').value = data.recesoInicio;
                 if (data.recesoFin) document.getElementById('recesoFin').value = data.recesoFin;
                 if (data.feriados) document.getElementById('feriados').value = data.feriados;
-                // Restaurar checks de días
                 const checks = document.querySelectorAll('#diasSemana input[type="checkbox"]');
                 checks.forEach(cb => { cb.checked = data.diasSeleccionados ? data.diasSeleccionados.includes(cb.value) : (cb.value === '3' || cb.value === '5'); });
-                if (data.alumnos) {
-                    document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
-                }
+                if (data.alumnos) document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
                 fechas = data.fechas || [];
                 document.getElementById('fechasClase').value = fechas.join('\n');
                 document.getElementById('contadorFechas').textContent = `${fechas.length} fechas generadas`;
@@ -753,12 +794,11 @@
                 renderizarRubrica();
             } else {
                 actualizarAlumnos();
-                generarCronograma(); // genera fechas por defecto
+                generarCronograma();
                 renderizarRubrica();
             }
         }
 
-        // Event listeners
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -767,16 +807,11 @@
                 document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
             });
         });
-
         document.getElementById('listaAlumnos').addEventListener('input', actualizarAlumnos);
         ['asignatura','curso','docente','regimen','anio','notaMinima','asistenciaMinima',
          'evalsEtapa1','evalsEtapa2','recupsPorEval','tpsEtapa1','tpsEtapa2'].forEach(id => {
-            document.getElementById(id).addEventListener('change', () => {
-                guardarEstado();
-                renderizarPrevisualizaciones();
-            });
+            document.getElementById(id).addEventListener('change', () => { guardarEstado(); renderizarPrevisualizaciones(); });
         });
-
         window.onload = cargarEstado;
     </script>
 </body>
