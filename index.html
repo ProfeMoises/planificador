@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Excel Académico con Gráfico</title>
+    <title>Generador de Excel Académico</title>
     <!-- ExcelJS (CDN confiable) -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <!-- PDF.js para importar rúbrica -->
@@ -120,7 +120,7 @@
 <body>
     <header class="app-header">
         <div>
-            <h1>📐 Generador de Excel Académico (con gráfico)</h1>
+            <h1>📐 Generador de Excel Académico</h1>
             <div style="font-size:0.8rem;opacity:0.85;">Configurá tu materia y descargá el libro con diseño profesional</div>
         </div>
         <div>
@@ -143,19 +143,19 @@
             <div class="card">
                 <h2>📌 Datos Generales de la Cátedra</h2>
                 <div class="grid-3">
-                    <div><label>Asignatura</label><input type="text" id="asignatura" placeholder="Nombre de la asignatura" value="Asignatura1"></div>
-                    <div><label>Curso / Comisión / Turno</label><input type="text" id="curso" placeholder="Ej: 4° C (Turno Mañana)" value="Curso1 (Turno Mañana)"></div>
-                    <div><label>Docente(s)</label><input type="text" id="docente" placeholder="Nombre del docente" value="NombreProfe"></div>
-                    <div><label>Régimen de Cursada</label><input type="text" id="regimen" placeholder="Ej: Anual - Miércoles y Viernes" value="Anual - Días a definir"></div>
-                    <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" placeholder="2026" value="2026"></div>
+                    <div><label>Asignatura</label><input type="text" id="asignatura" value="Asignatura1"></div>
+                    <div><label>Curso / Comisión / Turno</label><input type="text" id="curso" value="Curso1 (Turno Mañana)"></div>
+                    <div><label>Docente(s)</label><input type="text" id="docente" value="NombreProfe"></div>
+                    <div><label>Régimen de Cursada</label><input type="text" id="regimen" value="Anual - Días a definir"></div>
+                    <div><label>Año del Ciclo Lectivo</label><input type="text" id="anio" value="2026"></div>
                     <div><label>Nota mínima de aprobación</label><input type="number" id="notaMinima" value="7.0" step="0.1"></div>
                     <div><label>Asistencia mínima (%)</label><input type="number" id="asistenciaMinima" value="75" step="1"></div>
                 </div>
             </div>
             <div class="card">
                 <h2>👥 Nómina de Alumnos</h2>
-                <p style="font-size:0.8rem; color:#6B7280;">Pegá la lista completa (DNI + Nombre, uno por línea). El sistema separa automáticamente.</p>
-                <textarea id="listaAlumnos" placeholder="00000001 NOMBRE1 APELLIDO1&#10;00000002 NOMBRE2 APELLIDO2&#10;...">00000001 NOMBRE1 APELLIDO1
+                <p style="font-size:0.8rem; color:#6B7280;">Pegá la lista completa (DNI + Nombre, uno por línea).</p>
+                <textarea id="listaAlumnos">00000001 NOMBRE1 APELLIDO1
 00000002 NOMBRE2 APELLIDO2
 00000003 NOMBRE3 APELLIDO3
 00000004 NOMBRE4 APELLIDO4
@@ -165,8 +165,8 @@
             <div class="card">
                 <h2>📅 Cronograma Automático de Clases</h2>
                 <div class="grid-2">
-                    <div><label>Fecha de inicio del ciclo</label><input type="date" id="fechaInicio" value="2026-03-02"></div>
-                    <div><label>Fecha de fin del ciclo</label><input type="date" id="fechaFin" value="2026-11-30"></div>
+                    <div><label>Fecha inicio</label><input type="date" id="fechaInicio" value="2026-03-02"></div>
+                    <div><label>Fecha fin</label><input type="date" id="fechaFin" value="2026-11-30"></div>
                 </div>
                 <div style="margin-top:12px;">
                     <label>Días de clase</label>
@@ -180,15 +180,15 @@
                     </div>
                 </div>
                 <div class="grid-2" style="margin-top:12px;">
-                    <div><label>Receso: fecha inicio</label><input type="date" id="recesoInicio" value=""></div>
-                    <div><label>Receso: fecha fin</label><input type="date" id="recesoFin" value=""></div>
+                    <div><label>Receso inicio</label><input type="date" id="recesoInicio"></div>
+                    <div><label>Receso fin</label><input type="date" id="recesoFin"></div>
                 </div>
                 <div style="margin-top:12px;">
-                    <label>Feriados (una fecha por línea, formato DD/MM/AAAA)</label>
-                    <textarea id="feriados" placeholder="01/01/2026&#10;..."></textarea>
+                    <label>Feriados (DD/MM/AAAA, uno por línea)</label>
+                    <textarea id="feriados"></textarea>
                 </div>
-                <button class="btn btn-generar" onclick="generarCronograma()">🔄 Generar Fechas de Clase</button>
-                <span class="badge" id="contadorFechas" style="margin-left:10px;">0 fechas generadas</span>
+                <button class="btn btn-generar" onclick="generarCronograma()">🔄 Generar Fechas</button>
+                <span class="badge" id="contadorFechas">0 fechas generadas</span>
                 <textarea id="fechasClase" style="display:none;"></textarea>
             </div>
             <div class="card">
@@ -196,7 +196,7 @@
                 <div class="grid-2">
                     <div><label>Nº Evaluaciones Etapa 1</label><input type="number" id="evalsEtapa1" value="4" min="1"></div>
                     <div><label>Nº Evaluaciones Etapa 2</label><input type="number" id="evalsEtapa2" value="4" min="0"></div>
-                    <div><label>Recuperatorios por Evaluación</label><input type="number" id="recupsPorEval" value="2" min="0"></div>
+                    <div><label>Recuperatorios por Eval.</label><input type="number" id="recupsPorEval" value="2" min="0"></div>
                     <div><label>Nº TPs Etapa 1</label><input type="number" id="tpsEtapa1" value="10" min="1"></div>
                     <div><label>Nº TPs Etapa 2</label><input type="number" id="tpsEtapa2" value="10" min="0"></div>
                     <div><label>Separador fórmulas</label>
@@ -210,24 +210,23 @@
         </section>
 
         <section class="tab-content" id="tab-asistencia">
-            <div class="card"><h2>📋 Previsualización de Asistencia</h2>
+            <div class="card"><h2>📋 Asistencia</h2>
                 <div class="table-wrapper"><table id="tablaAsistencia"><thead id="theadAsistencia"></thead><tbody id="tbodyAsistencia"></tbody></table></div>
             </div>
         </section>
         <section class="tab-content" id="tab-tps">
-            <div class="card"><h2>📝 Previsualización de Trabajos Prácticos</h2>
+            <div class="card"><h2>📝 Trabajos Prácticos</h2>
                 <div class="table-wrapper"><table id="tablaTPs"><thead id="theadTPs"></thead><tbody id="tbodyTPs"></tbody></table></div>
             </div>
         </section>
         <section class="tab-content" id="tab-notas">
-            <div class="card"><h2>🎯 Previsualización de Notas</h2>
+            <div class="card"><h2>🎯 Notas</h2>
                 <div class="table-wrapper"><table id="tablaNotas"><thead id="theadNotas"></thead><tbody id="tbodyNotas"></tbody></table></div>
             </div>
         </section>
         <section class="tab-content" id="tab-rubrica">
-            <div class="card"><h2>📏 Rúbrica de Evaluación (editable)</h2>
-                <p style="font-size:0.8rem; color:#6B7280;">Hacé clic en las celdas para editar. También podés importar desde PDF.</p>
-                <div class="table-wrapper"><table id="tablaRubrica"><thead><tr><th>Criterio</th><th>Insuficiente (1-3)</th><th>Regular (4-6)</th><th>Bueno (7-8)</th><th>Excelente (9-10)</th></tr></thead><tbody id="tbodyRubrica"></tbody></table></div>
+            <div class="card"><h2>📏 Rúbrica</h2>
+                <div class="table-wrapper"><table id="tablaRubrica"><thead><tr><th>Criterio</th><th>Insuficiente</th><th>Regular</th><th>Bueno</th><th>Excelente</th></tr></thead><tbody id="tbodyRubrica"></tbody></table></div>
                 <button class="btn" style="background:#D6E4F0; margin-top:10px;" onclick="agregarCriterio()">➕ Agregar criterio</button>
             </div>
         </section>
@@ -238,23 +237,21 @@
         let alumnos = [];
         let fechas = [];
         let rubricaCriterios = [
-            ['Criterio 1', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
-            ['Criterio 2', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
-            ['Criterio 3', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente'],
-            ['Criterio 4', 'Descripción nivel insuficiente', 'Descripción nivel regular', 'Descripción nivel bueno', 'Descripción nivel excelente']
+            ['Criterio 1', 'Descripción insuficiente', 'Descripción regular', 'Descripción bueno', 'Descripción excelente'],
+            ['Criterio 2', 'Descripción insuficiente', 'Descripción regular', 'Descripción bueno', 'Descripción excelente'],
+            ['Criterio 3', 'Descripción insuficiente', 'Descripción regular', 'Descripción bueno', 'Descripción excelente'],
+            ['Criterio 4', 'Descripción insuficiente', 'Descripción regular', 'Descripción bueno', 'Descripción excelente']
         ];
 
-        // ==================== FUNCIONES DE ACTUALIZACIÓN ====================
+        // ==================== ACTUALIZACIONES ====================
         function actualizarAlumnos() {
             const texto = document.getElementById('listaAlumnos').value.trim();
             const lineas = texto.split('\n').filter(l => l.trim() !== '');
             alumnos = lineas.map(linea => {
                 const partes = linea.trim().split(/\s+(.+)/);
-                const dni = partes[0] || '';
-                const nombre = partes[1] || '';
-                return { dni, nombre };
+                return { dni: partes[0] || '', nombre: partes[1] || '' };
             });
-            document.getElementById('contadorAlumnos').textContent = `${alumnos.length} alumnos cargados`;
+            document.getElementById('contadorAlumnos').textContent = `${alumnos.length} alumnos`;
             guardarEstado();
             renderizarPrevisualizaciones();
         }
@@ -263,40 +260,38 @@
             const inicio = new Date(document.getElementById('fechaInicio').value + 'T00:00:00');
             const fin = new Date(document.getElementById('fechaFin').value + 'T00:00:00');
             if (isNaN(inicio) || isNaN(fin) || inicio > fin) { alert('Fechas inválidas'); return; }
-            const diasSeleccionados = Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
-            if (diasSeleccionados.length === 0) { alert('Seleccioná al menos un día de clase'); return; }
+            const diasSel = Array.from(document.querySelectorAll('#diasSemana input:checked')).map(cb => parseInt(cb.value));
+            if (diasSel.length === 0) { alert('Seleccioná al menos un día'); return; }
             const recIni = document.getElementById('recesoInicio').value ? new Date(document.getElementById('recesoInicio').value + 'T00:00:00') : null;
             const recFin = document.getElementById('recesoFin').value ? new Date(document.getElementById('recesoFin').value + 'T00:00:00') : null;
-            const feriadosTexto = document.getElementById('feriados').value.trim();
-            const feriados = feriadosTexto.split('\n').filter(l => l.trim() !== '').map(l => {
+            const ferText = document.getElementById('feriados').value.trim();
+            const feriados = ferText.split('\n').filter(l => l.trim() !== '').map(l => {
                 const p = l.trim().split('/');
                 if (p.length === 3) return new Date(p[2], p[1]-1, p[0]);
                 return null;
             }).filter(d => d && !isNaN(d));
             fechas = [];
-            const current = new Date(inicio);
-            while (current <= fin) {
-                const diaSemana = current.getDay();
-                const idx = diaSemana === 0 ? 7 : diaSemana;
-                const esDiaClase = diasSeleccionados.includes(idx);
-                let esReceso = false;
-                if (recIni && recFin && !isNaN(recIni) && !isNaN(recFin)) {
-                    esReceso = current >= recIni && current <= recFin;
+            const cur = new Date(inicio);
+            while (cur <= fin) {
+                const ds = cur.getDay();
+                const idx = ds === 0 ? 7 : ds;
+                if (diasSel.includes(idx)) {
+                    let enReceso = false;
+                    if (recIni && recFin && !isNaN(recIni) && !isNaN(recFin)) {
+                        enReceso = cur >= recIni && cur <= recFin;
+                    }
+                    const esFeriado = feriados.some(f => f.toDateString() === cur.toDateString());
+                    if (!enReceso && !esFeriado) fechas.push(new Date(cur));
                 }
-                const esFeriado = feriados.some(f => f.toDateString() === current.toDateString());
-                if (esDiaClase && !esReceso && !esFeriado) {
-                    fechas.push(new Date(current));
-                }
-                current.setDate(current.getDate() + 1);
+                cur.setDate(cur.getDate() + 1);
             }
             fechas = fechas.map(d => {
                 const dia = String(d.getDate()).padStart(2,'0');
                 const mes = String(d.getMonth()+1).padStart(2,'0');
-                const anio = d.getFullYear();
-                return `${dia}/${mes}/${anio}`;
+                return `${dia}/${mes}/${d.getFullYear()}`;
             });
             document.getElementById('fechasClase').value = fechas.join('\n');
-            document.getElementById('contadorFechas').textContent = `${fechas.length} fechas generadas`;
+            document.getElementById('contadorFechas').textContent = `${fechas.length} fechas`;
             guardarEstado();
             renderizarPrevisualizaciones();
         }
@@ -306,9 +301,7 @@
             rubricaCriterios = [];
             filas.forEach(tr => {
                 const celdas = tr.querySelectorAll('td');
-                if (celdas.length >= 5) {
-                    rubricaCriterios.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim(), celdas[3].textContent.trim(), celdas[4].textContent.trim()]);
-                }
+                if (celdas.length >= 5) rubricaCriterios.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim(), celdas[3].textContent.trim(), celdas[4].textContent.trim()]);
             });
             guardarEstado();
         }
@@ -338,7 +331,7 @@
         function renderizarTPs() {
             const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value)||10;
             const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value)||10;
-            const totalTPs = tpsE1+tpsE2;
+            const total = tpsE1+tpsE2;
             const thead = document.getElementById('theadTPs');
             const tbody = document.getElementById('tbodyTPs');
             let html = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
@@ -351,7 +344,7 @@
             thead.innerHTML = html;
             tbody.innerHTML = alumnos.map((a,i) => {
                 let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
-                for(let j=0; j<totalTPs; j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
+                for(let j=0; j<total; j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
                 row += `<td>-</td>`;
                 return `<tr>${row}</tr>`;
             }).join('');
@@ -360,21 +353,21 @@
         function renderizarNotas() {
             const evalsE1 = parseInt(document.getElementById('evalsEtapa1').value)||4;
             const evalsE2 = parseInt(document.getElementById('evalsEtapa2').value)||4;
-            const recups = parseInt(document.getElementById('recupsPorEval').value)||2;
+            const rec = parseInt(document.getElementById('recupsPorEval').value)||2;
             const totalEvals = evalsE1+evalsE2;
             const thead = document.getElementById('theadNotas');
             const tbody = document.getElementById('tbodyNotas');
             let html = `<tr><th class="sticky-col col-a" rowspan="2">Nº</th><th class="sticky-col col-b" rowspan="2">DNI</th><th class="sticky-col col-c" rowspan="2">Alumno</th>`;
-            if(evalsE1>0) html += `<th colspan="${evalsE1*(1+recups)}">Etapa 1</th>`;
-            if(evalsE2>0) html += `<th colspan="${evalsE2*(1+recups)}">Etapa 2</th>`;
+            if(evalsE1>0) html += `<th colspan="${evalsE1*(1+rec)}">Etapa 1</th>`;
+            if(evalsE2>0) html += `<th colspan="${evalsE2*(1+rec)}">Etapa 2</th>`;
             html += `<th rowspan="2">Nota Final</th><th rowspan="2">Estado</th></tr><tr>`;
-            for(let e=1; e<=evalsE1; e++) { html += `<th>Ev${e}</th>`; for(let r=1; r<=recups; r++) html += `<th>Rec${r}</th>`; }
-            for(let e=1; e<=evalsE2; e++) { html += `<th>Ev${evalsE1+e}</th>`; for(let r=1; r<=recups; r++) html += `<th>Rec${r}</th>`; }
+            for(let e=1; e<=evalsE1; e++) { html += `<th>Ev${e}</th>`; for(let r=1; r<=rec; r++) html += `<th>Rec${r}</th>`; }
+            for(let e=1; e<=evalsE2; e++) { html += `<th>Ev${evalsE1+e}</th>`; for(let r=1; r<=rec; r++) html += `<th>Rec${r}</th>`; }
             html += `</tr>`;
             thead.innerHTML = html;
             tbody.innerHTML = alumnos.map((a,i) => {
                 let row = `<td class="sticky-col col-a">${i+1}</td><td class="sticky-col col-b">${a.dni}</td><td class="sticky-col col-c">${a.nombre}</td>`;
-                for(let j=0; j<totalEvals*(1+recups); j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
+                for(let j=0; j<totalEvals*(1+rec); j++) row += `<td><input class="cell-input" type="number" step="0.1"></td>`;
                 row += `<td>-</td><td>-</td>`;
                 return `<tr>${row}</tr>`;
             }).join('');
@@ -414,13 +407,12 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // ==================== GENERACIÓN DE EXCEL CON EXCELJS ====================
-        function colLetter(index) {
+        // ==================== GENERACIÓN EXCEL ====================
+        function colLetter(idx) { // idx 1-based
             let letter = '';
-            while (index > 0) {
-                let mod = (index - 1) % 26;
-                letter = String.fromCharCode(65 + mod) + letter;
-                index = Math.floor((index - 1) / 26);
+            while (idx > 0) {
+                letter = String.fromCharCode(65 + (idx-1)%26) + letter;
+                idx = Math.floor((idx-1)/26);
             }
             return letter;
         }
@@ -428,7 +420,7 @@
         async function descargarExcel() {
             try {
                 actualizarAlumnos();
-                if (fechas.length === 0) { alert('Primero generá el cronograma de fechas.'); return; }
+                if (fechas.length === 0) { alert('Generá primero el cronograma.'); return; }
                 const sep = document.getElementById('separadorFormulas').value;
                 const notaMin = parseFloat(document.getElementById('notaMinima').value);
                 const asistMin = parseInt(document.getElementById('asistenciaMinima').value);
@@ -437,286 +429,208 @@
                 const recups = parseInt(document.getElementById('recupsPorEval').value);
                 const tpsE1 = parseInt(document.getElementById('tpsEtapa1').value);
                 const tpsE2 = parseInt(document.getElementById('tpsEtapa2').value);
-                const totalEvals = evalsE1 + evalsE2;
-                const totalTPs = tpsE1 + tpsE2;
-                const colsPorEval = 1 + recups;
+                const totalEvals = evalsE1+evalsE2, totalTPs = tpsE1+tpsE2;
+                const colsPorEval = 1+recups;
 
                 const wb = new ExcelJS.Workbook();
-                wb.creator = 'Generador Académico';
+                const titulo = { font:{name:'Calibri',size:14,bold:true,color:{argb:'FFFFFF'}}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'002060'}}, alignment:{vertical:'middle',horizontal:'center'}, border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}} };
+                const subt = { font:{name:'Calibri',size:11,bold:true}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'C8C8C8'}}, alignment:{vertical:'middle',horizontal:'center'}, border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}} };
+                const cab = { font:{name:'Calibri',size:10,bold:true}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'E6E6E6'}}, alignment:{vertical:'middle',horizontal:'center'}, border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}} };
+                const dato = { font:{name:'Calibri',size:10}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFF'}}, alignment:{vertical:'middle',horizontal:'center'}, border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}} };
+                const notaF = { ...dato, font:{...dato.font,bold:true}, fill:{...dato.fill,fgColor:{argb:'FFFFCC'}} };
+                const datoL = { ...dato, alignment:{vertical:'middle',horizontal:'left'} };
 
-                // Estilos
-                const tituloStyle = { font: { name: 'Calibri', size: 14, bold: true, color: { argb: 'FFFFFFFF' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002060' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
-                const subtituloStyle = { font: { name: 'Calibri', size: 11, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8C8C8' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
-                const cabeceraStyle = { font: { name: 'Calibri', size: 10, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6E6E6' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
-                const datoStyle = { font: { name: 'Calibri', size: 10 }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
-                const notaFinalStyle = { font: { name: 'Calibri', size: 10, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFCC' } }, alignment: { vertical: 'middle', horizontal: 'center' }, border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } } };
-                const datoLeft = { ...datoStyle, alignment: { vertical: 'middle', horizontal: 'left' } };
-
-                // ---------- DASHBOARD ----------
-                const wsDash = wb.addWorksheet('Dashboard');
-                wsDash.mergeCells('A1:C1');
-                const rowTit = wsDash.getRow(1); rowTit.height = 35;
-                rowTit.getCell(1).value = 'SEGUIMIENTO ACADÉMICO'; rowTit.getCell(1).style = tituloStyle;
-                rowTit.getCell(2).style = tituloStyle; rowTit.getCell(3).style = tituloStyle;
-
-                const meta = [
-                    ['Asignatura:', document.getElementById('asignatura').value, ''],
-                    ['Curso:', document.getElementById('curso').value, ''],
-                    ['Docente:', document.getElementById('docente').value, ''],
-                    ['Régimen:', document.getElementById('regimen').value, ''],
-                    ['Año:', document.getElementById('anio').value, ''],
-                    ['Nota mínima:', notaMin, ''],
-                    ['Asistencia mínima:', asistMin + '%', '']
-                ];
-                meta.forEach((rowData, i) => {
-                    const row = wsDash.getRow(i+3);
-                    rowData.forEach((val, j) => {
-                        const cell = row.getCell(j+1);
-                        if (j === 0) { cell.style = { ...datoStyle, font: { bold: true } }; cell.value = val; }
-                        else { cell.style = datoStyle; cell.value = val; }
-                    });
+                // --- DASHBOARD ---
+                const wsD = wb.addWorksheet('Dashboard');
+                wsD.mergeCells('A1:C1');
+                wsD.getRow(1).height=35; wsD.getRow(1).getCell(1).value='SEGUIMIENTO ACADÉMICO'; wsD.getRow(1).getCell(1).style=titulo;
+                [[3,'Asignatura:',document.getElementById('asignatura').value,''],
+                 [4,'Curso:',document.getElementById('curso').value,''],
+                 [5,'Docente:',document.getElementById('docente').value,''],
+                 [6,'Régimen:',document.getElementById('regimen').value,''],
+                 [7,'Año:',document.getElementById('anio').value,''],
+                 [8,'Nota mínima:',notaMin,''],
+                 [9,'Asistencia mínima:',asistMin+'%','']].forEach(([r,...vals])=>{
+                    const row=wsD.getRow(r);
+                    vals.forEach((v,j)=>row.getCell(j+1).value=v);
                 });
+                wsD.getRow(10).getCell(1).value='Métrica de Gestión'; wsD.getRow(10).getCell(1).style=subt;
+                wsD.getRow(10).getCell(2).value='Valor Actual'; wsD.getRow(10).getCell(2).style=subt;
+                wsD.getRow(11).getCell(1).value='Total de Alumnos'; wsD.getRow(11).getCell(2).value=alumnos.length;
+                wsD.getRow(12).getCell(1).value='Promedio General del Curso';
+                wsD.getRow(12).getCell(2).value={formula:`PROMEDIO(Notas!${colLetter(4+totalEvals*colsPorEval)}6:${colLetter(4+totalEvals*colsPorEval)}${5+alumnos.length})`};
+                wsD.getRow(13).getCell(1).value='Asistencia Promedio del Ciclo';
+                wsD.getRow(13).getCell(2).value={formula:`PROMEDIO(Asistencia!${colLetter(4+fechas.length)}6:${colLetter(4+fechas.length)}${5+alumnos.length})`};
+                wsD.getRow(15).getCell(1).value='Estado / Condición Final'; wsD.getRow(15).getCell(1).style=subt;
+                wsD.getRow(15).getCell(2).value='Cantidad'; wsD.getRow(15).getCell(2).style=subt;
+                const colEst = colLetter(5+totalEvals*colsPorEval);
+                wsD.getRow(16).getCell(1).value='Aprobado'; wsD.getRow(16).getCell(2).value={formula:`CONTAR.SI(Notas!${colEst}6:${colEst}${5+alumnos.length};"Aprobado")`};
+                wsD.getRow(17).getCell(1).value='Libre por Nota'; wsD.getRow(17).getCell(2).value={formula:`CONTAR.SI(Notas!${colEst}6:${colEst}${5+alumnos.length};"Libre por Nota")`};
+                wsD.getRow(18).getCell(1).value='Libre por Asistencia'; wsD.getRow(18).getCell(2).value={formula:`CONTAR.SI(Notas!${colEst}6:${colEst}${5+alumnos.length};"Libre por Asistencia")`};
+                for(let r=3;r<=18;r++) for(let c=1;c<=3;c++) wsD.getRow(r).getCell(c).style=(r>=11&&r<=13||r>=16)?dato:(r===10||r===15)?subt:(c===1?{...dato,font:{bold:true}}:dato);
+                wsD.columns=[{width:30},{width:20},{width:10}];
 
-                const filaMetricas = 10;
-                wsDash.getRow(filaMetricas).getCell(1).value = 'Métrica de Gestión'; wsDash.getRow(filaMetricas).getCell(1).style = subtituloStyle;
-                wsDash.getRow(filaMetricas).getCell(2).value = 'Valor Actual'; wsDash.getRow(filaMetricas).getCell(2).style = subtituloStyle;
-                wsDash.getRow(11).getCell(1).value = 'Total de Alumnos'; wsDash.getRow(11).getCell(2).value = alumnos.length;
-                wsDash.getRow(12).getCell(1).value = 'Promedio General del Curso';
-                wsDash.getRow(12).getCell(2).value = { formula: `PROMEDIO(Notas!${colLetter(4+totalEvals*colsPorEval)}6:${colLetter(4+totalEvals*colsPorEval)}${5+alumnos.length})` };
-                wsDash.getRow(13).getCell(1).value = 'Asistencia Promedio del Ciclo';
-                wsDash.getRow(13).getCell(2).value = { formula: `PROMEDIO(Asistencia!${colLetter(4+fechas.length)}6:${colLetter(4+fechas.length)}${5+alumnos.length})` };
-
-                const filaResumen = 15;
-                wsDash.getRow(filaResumen).getCell(1).value = 'Estado / Condición Final'; wsDash.getRow(filaResumen).getCell(1).style = subtituloStyle;
-                wsDash.getRow(filaResumen).getCell(2).value = 'Cantidad Alumnos'; wsDash.getRow(filaResumen).getCell(2).style = subtituloStyle;
-                const colEstadoLetra = colLetter(5+totalEvals*colsPorEval);
-                wsDash.getRow(16).getCell(1).value = 'Aprobado';
-                wsDash.getRow(16).getCell(2).value = { formula: `CONTAR.SI(Notas!${colEstadoLetra}6:${colEstadoLetra}${5+alumnos.length};"Aprobado")` };
-                wsDash.getRow(17).getCell(1).value = 'Libre por Nota';
-                wsDash.getRow(17).getCell(2).value = { formula: `CONTAR.SI(Notas!${colEstadoLetra}6:${colEstadoLetra}${5+alumnos.length};"Libre por Nota")` };
-                wsDash.getRow(18).getCell(1).value = 'Libre por Asistencia';
-                wsDash.getRow(18).getCell(2).value = { formula: `CONTAR.SI(Notas!${colEstadoLetra}6:${colEstadoLetra}${5+alumnos.length};"Libre por Asistencia")` };
-
-                for (let r = 3; r <= 18; r++) {
-                    for (let c = 1; c <= 3; c++) {
-                        wsDash.getRow(r).getCell(c).style = (r >= 11 && r <= 13 || r >= 16) ? datoStyle : (r === 10 || r === 15) ? subtituloStyle : (c === 1 ? { ...datoStyle, font: { bold: true } } : datoStyle);
-                    }
+                // --- ASISTENCIA ---
+                const wsA = wb.addWorksheet('Asistencia');
+                const ultA = 3+fechas.length;
+                wsA.mergeCells(1,1,1,ultA+1); wsA.getRow(1).height=35; wsA.getRow(1).getCell(1).value='REGISTRO ANUAL DE ASISTENCIA'; wsA.getRow(1).getCell(1).style=titulo;
+                wsA.mergeCells(3,1,3,3); wsA.getRow(3).getCell(1).value='DATOS DEL ALUMNO'; wsA.getRow(3).getCell(1).style=subt;
+                wsA.mergeCells(3,4,3,ultA); wsA.getRow(3).getCell(4).value='REGISTRO DE ASISTENCIA DIARIA'; wsA.getRow(3).getCell(4).style=subt;
+                wsA.getRow(3).getCell(ultA+1).value='MÉTRICA'; wsA.getRow(3).getCell(ultA+1).style=subt;
+                ['Nº','DNI','Apellido y Nombre',...fechas.map(f=>f.slice(0,5)),'% Asistencia'].forEach((v,i)=>wsA.getRow(4).getCell(i+1).value=v,wsA.getRow(4).style=cab);
+                for(let i=0;i<alumnos.length;i++){
+                    const r=i+5; const row=wsA.getRow(r);
+                    row.getCell(1).value=i+1; row.getCell(2).value=alumnos[i].dni; row.getCell(3).value=alumnos[i].nombre; row.getCell(3).style=datoL;
+                    for(let j=0;j<fechas.length;j++) row.getCell(4+j).value='';
+                    const cPct=4+fechas.length;
+                    row.getCell(cPct).value={formula:`SI(CONTARA(D${r}:${colLetter(cPct-1)}${r})>0${sep}CONTAR.SI(D${r}:${colLetter(cPct-1)}${r}${sep}"P")/CONTARA(D${r}:${colLetter(cPct-1)}${r})${sep}0)`,numFmt:'0%'};
+                    for(let c=1;c<=cPct;c++) row.getCell(c).style=(c===3)?datoL:dato;
                 }
-                wsDash.columns = [{ width: 30 }, { width: 20 }, { width: 10 }];
+                wsA.columns=[{width:5},{width:12},{width:30},...fechas.map(()=>({width:5})),{width:10}];
+                wsA.views=[{state:'frozen',xSplit:3,ySplit:4}];
 
-                // Agregar gráfico de barras en Dashboard
-                wsDash.getRow(20).getCell(1).value = 'Distribución de Alumnos por Condición';
-                wsDash.getRow(20).getCell(1).style = { font: { bold: true, size: 12 } };
-                const chart = wsDash.addChart('bar', 'columnaAgrupada', 'Gráfico de Condiciones', 'A20', 'F35');
-                chart.title = 'Distribución de Alumnos por Condición';
-                chart.xAxis = 'Condición';
-                chart.yAxis = 'Cantidad';
-                chart.dataLabels = { showValue: true };
-                chart.series = [{
-                    name: 'Cantidad',
-                    categories: 'Dashboard!A16:A18',
-                    values: 'Dashboard!B16:B18'
-                }];
-                chart.series[0].fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
-
-                // ---------- ASISTENCIA ----------
-                const wsAsis = wb.addWorksheet('Asistencia');
-                const ultColAsis = 3 + fechas.length;
-                wsAsis.mergeCells(1, 1, 1, ultColAsis+1);
-                wsAsis.getRow(1).getCell(1).value = 'REGISTRO ANUAL DE ASISTENCIA'; wsAsis.getRow(1).getCell(1).style = tituloStyle;
-                wsAsis.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsAsis.mergeCells(3, 1, 3, 3);
-                wsAsis.getRow(3).getCell(4).value = 'REGISTRO DE ASISTENCIA DIARIA'; wsAsis.mergeCells(3, 4, 3, ultColAsis);
-                wsAsis.getRow(3).getCell(ultColAsis+1).value = 'MÉTRICA';
-                for (let c = 1; c <= ultColAsis+1; c++) wsAsis.getRow(3).getCell(c).style = subtituloStyle;
-
-                const cabAsis = ['Nº', 'DNI', 'Apellido y Nombre', ...fechas.map(f => f.slice(0,5)), '% Asistencia'];
-                const rowCabAsis = wsAsis.getRow(4);
-                cabAsis.forEach((h, i) => { rowCabAsis.getCell(i+1).value = h; rowCabAsis.getCell(i+1).style = cabeceraStyle; });
-
-                for (let i = 0; i < alumnos.length; i++) {
-                    const row = wsAsis.getRow(i+5);
-                    row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
-                    row.getCell(3).style = datoLeft;
-                    for (let j = 0; j < fechas.length; j++) row.getCell(4+j).value = '';
-                    const colPct = 4+fechas.length;
-                    row.getCell(colPct).value = { formula: `SI(CONTARA(D${i+5}:${colLetter(colPct-1)}${i+5})>0${sep}CONTAR.SI(D${i+5}:${colLetter(colPct-1)}${i+5}${sep}"P")/CONTARA(D${i+5}:${colLetter(colPct-1)}${i+5})${sep}0)` };
-                    row.getCell(colPct).numFmt = '0%';
-                    for (let c = 1; c <= colPct; c++) row.getCell(c).style = (c === 3) ? datoLeft : datoStyle;
+                // --- TPs ---
+                const wsT = wb.addWorksheet('Trabajos Prácticos');
+                wsT.mergeCells(1,1,1,4+totalTPs); wsT.getRow(1).height=35; wsT.getRow(1).getCell(1).value='SEGUIMIENTO DE TRABAJOS PRÁCTICOS'; wsT.getRow(1).getCell(1).style=titulo;
+                wsT.mergeCells(3,1,3,3); wsT.getRow(3).getCell(1).value='DATOS DEL ALUMNO'; wsT.getRow(3).getCell(1).style=subt;
+                if(tpsE1>0){wsT.mergeCells(3,4,3,4+tpsE1-1);wsT.getRow(3).getCell(4).value=`ETAPA 1 (TP 1 - TP ${tpsE1})`;}
+                if(tpsE2>0){wsT.mergeCells(3,4+tpsE1,3,4+totalTPs-1);wsT.getRow(3).getCell(4+tpsE1).value=`ETAPA 2 (TP ${tpsE1+1} - TP ${totalTPs})`;}
+                wsT.mergeCells(3,4+totalTPs,3,4+totalTPs); wsT.getRow(3).getCell(4+totalTPs).value='PROMEDIO';
+                ['Nº','DNI','Apellido y Nombre',...Array.from({length:totalTPs},(_,i)=>`TP${i+1}`),'Promedio TPs'].forEach((v,i)=>wsT.getRow(4).getCell(i+1).value=v,wsT.getRow(4).style=cab);
+                for(let i=0;i<alumnos.length;i++){
+                    const r=i+5; const row=wsT.getRow(r);
+                    row.getCell(1).value=i+1; row.getCell(2).value=alumnos[i].dni; row.getCell(3).value=alumnos[i].nombre; row.getCell(3).style=datoL;
+                    for(let j=0;j<totalTPs;j++) row.getCell(4+j).value='';
+                    row.getCell(4+totalTPs).value={formula:`PROMEDIO(D${r}:${colLetter(4+totalTPs-1)}${r})`,numFmt:'0.0'};
+                    for(let c=1;c<=4+totalTPs;c++) row.getCell(c).style=(c===3)?datoL:dato;
                 }
-                wsAsis.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...fechas.map(() => ({ width: 5 })), { width: 10 }];
-                wsAsis.views = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
+                wsT.columns=[{width:5},{width:12},{width:30},...Array(totalTPs).fill({width:6}),{width:10}];
+                wsT.views=[{state:'frozen',xSplit:3,ySplit:4}];
 
-                // ---------- TRABAJOS PRÁCTICOS ----------
-                const wsTPs = wb.addWorksheet('Trabajos Prácticos');
-                wsTPs.mergeCells(1, 1, 1, 3+totalTPs+1);
-                wsTPs.getRow(1).getCell(1).value = 'SEGUIMIENTO DE TRABAJOS PRÁCTICOS'; wsTPs.getRow(1).getCell(1).style = tituloStyle;
-                wsTPs.mergeCells(3, 1, 3, 3);
-                wsTPs.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsTPs.getRow(3).getCell(1).style = subtituloStyle;
-                if (tpsE1 > 0) { wsTPs.mergeCells(3, 4, 3, 4+tpsE1-1); wsTPs.getRow(3).getCell(4).value = `ETAPA 1 (TP 1 - TP ${tpsE1})`; }
-                if (tpsE2 > 0) { wsTPs.mergeCells(3, 4+tpsE1, 3, 4+totalTPs-1); wsTPs.getRow(3).getCell(4+tpsE1).value = `ETAPA 2 (TP ${tpsE1+1} - TP ${totalTPs})`; }
-                wsTPs.mergeCells(3, 4+totalTPs, 3, 4+totalTPs);
-                wsTPs.getRow(3).getCell(4+totalTPs).value = 'PROMEDIO'; wsTPs.getRow(3).getCell(4+totalTPs).style = subtituloStyle;
-                const cabTPs = ['Nº', 'DNI', 'Apellido y Nombre', ...Array.from({length: totalTPs}, (_,i) => `TP${i+1}`), 'Promedio TPs'];
-                const rowCabTPs = wsTPs.getRow(4);
-                cabTPs.forEach((h, i) => { rowCabTPs.getCell(i+1).value = h; rowCabTPs.getCell(i+1).style = cabeceraStyle; });
-                for (let i = 0; i < alumnos.length; i++) {
-                    const row = wsTPs.getRow(i+5);
-                    row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
-                    row.getCell(3).style = datoLeft;
-                    for (let j = 0; j < totalTPs; j++) row.getCell(4+j).value = '';
-                    row.getCell(4+totalTPs).value = { formula: `PROMEDIO(D${i+5}:${colLetter(4+totalTPs-1)}${i+5})`, numFmt: '0.0' };
-                    for (let c = 1; c <= 4+totalTPs; c++) row.getCell(c).style = (c === 3) ? datoLeft : datoStyle;
+                // --- NOTAS ---
+                const wsN = wb.addWorksheet('Notas');
+                wsN.mergeCells(1,1,1,5+totalEvals*colsPorEval); wsN.getRow(1).height=35; wsN.getRow(1).getCell(1).value='CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES'; wsN.getRow(1).getCell(1).style=titulo;
+                wsN.mergeCells(3,1,3,3); wsN.getRow(3).getCell(1).value='DATOS DEL ALUMNO'; wsN.getRow(3).getCell(1).style=subt;
+                if(evalsE1>0){wsN.mergeCells(3,4,3,4+evalsE1*colsPorEval-1);wsN.getRow(3).getCell(4).value='EVALUACIONES - ETAPA 1';}
+                if(evalsE2>0){wsN.mergeCells(3,4+evalsE1*colsPorEval,3,4+totalEvals*colsPorEval-1);wsN.getRow(3).getCell(4+evalsE1*colsPorEval).value='EVALUACIONES - ETAPA 2';}
+                wsN.mergeCells(3,4+totalEvals*colsPorEval,3,5+totalEvals*colsPorEval); wsN.getRow(3).getCell(4+totalEvals*colsPorEval).value='RESULTADOS FINALES';
+                const h1=['Nº','DNI','Apellido y Nombre'];
+                for(let e=1;e<=totalEvals;e++) h1.push(`Ev${e}`,...Array(recups).fill(''));
+                h1.push('Nota Final','Estado');
+                const h2=['','',''];
+                for(let e=1;e<=totalEvals;e++) h2.push('Nota',...Array.from({length:recups},(_,i)=>`Rec${i+1}`));
+                h2.push('','');
+                h1.forEach((v,i)=>wsN.getRow(4).getCell(i+1).value=v,wsN.getRow(4).style=cab);
+                h2.forEach((v,i)=>wsN.getRow(5).getCell(i+1).value=v,wsN.getRow(5).style=cab);
+                const colNF=4+totalEvals*colsPorEval;
+                for(let i=0;i<alumnos.length;i++){
+                    const r=i+6; const row=wsN.getRow(r);
+                    row.getCell(1).value=i+1; row.getCell(2).value=alumnos[i].dni; row.getCell(3).value=alumnos[i].nombre; row.getCell(3).style=datoL;
+                    for(let j=0;j<totalEvals*colsPorEval;j++) row.getCell(4+j).value='';
+                    const partes=[];
+                    for(let e=0;e<totalEvals;e++) partes.push(`MAX(${colLetter(4+e*colsPorEval)}${r}:${colLetter(4+e*colsPorEval+recups)}${r})`);
+                    row.getCell(colNF).value={formula:'=PROMEDIO('+partes.join(sep)+')',numFmt:'0.0'}; row.getCell(colNF).style=notaF;
+                    row.getCell(colNF+1).value={formula:`SI(Asistencia!${colLetter(4+fechas.length)}${i+5}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetter(colNF)}${r}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))`};
+                    for(let c=1;c<=colNF+1;c++) if(c!==colNF && c!==3) row.getCell(c).style=dato;
                 }
-                wsTPs.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...Array(totalTPs).fill({ width: 6 }), { width: 10 }];
-                wsTPs.views = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
+                wsN.columns=[{width:5},{width:12},{width:30},...Array(totalEvals*colsPorEval).fill({width:6}),{width:11},{width:18}];
+                wsN.views=[{state:'frozen',xSplit:3,ySplit:5}];
+                wsN.mergeCells(4,1,5,1); wsN.mergeCells(4,2,5,2); wsN.mergeCells(4,3,5,3); wsN.mergeCells(4,colNF,5,colNF); wsN.mergeCells(4,colNF+1,5,colNF+1);
+                for(let e=0;e<totalEvals;e++) wsN.mergeCells(4,4+e*colsPorEval,4,4+(e+1)*colsPorEval-1);
 
-                // ---------- NOTAS ----------
-                const wsNotas = wb.addWorksheet('Notas');
-                wsNotas.mergeCells(1, 1, 1, 4+totalEvals*colsPorEval+1);
-                wsNotas.getRow(1).getCell(1).value = 'CONSOLIDADO DE EVALUACIONES Y CALIFICACIONES'; wsNotas.getRow(1).getCell(1).style = tituloStyle;
-                wsNotas.mergeCells(3, 1, 3, 3);
-                wsNotas.getRow(3).getCell(1).value = 'DATOS DEL ALUMNO'; wsNotas.getRow(3).getCell(1).style = subtituloStyle;
-                if (evalsE1 > 0) { wsNotas.mergeCells(3, 4, 3, 4+evalsE1*colsPorEval-1); wsNotas.getRow(3).getCell(4).value = 'EVALUACIONES - ETAPA 1'; }
-                if (evalsE2 > 0) { wsNotas.mergeCells(3, 4+evalsE1*colsPorEval, 3, 4+totalEvals*colsPorEval-1); wsNotas.getRow(3).getCell(4+evalsE1*colsPorEval).value = 'EVALUACIONES - ETAPA 2'; }
-                wsNotas.mergeCells(3, 4+totalEvals*colsPorEval, 3, 5+totalEvals*colsPorEval);
-                wsNotas.getRow(3).getCell(4+totalEvals*colsPorEval).value = 'RESULTADOS FINALES'; wsNotas.getRow(3).getCell(4+totalEvals*colsPorEval).style = subtituloStyle;
-
-                const cabNotas1 = ['Nº', 'DNI', 'Apellido y Nombre'];
-                for (let e=1; e<=totalEvals; e++) cabNotas1.push(`Ev${e}`, ...Array(recups).fill(''));
-                cabNotas1.push('Nota Final', 'Estado');
-                const cabNotas2 = ['', '', ''];
-                for (let e=1; e<=totalEvals; e++) cabNotas2.push('Nota', ...Array.from({length:recups}, (_,r) => `Rec${r+1}`));
-                cabNotas2.push('', '');
-                const rowCabNotas1 = wsNotas.getRow(4); cabNotas1.forEach((h,i) => { rowCabNotas1.getCell(i+1).value = h; rowCabNotas1.getCell(i+1).style = cabeceraStyle; });
-                const rowCabNotas2 = wsNotas.getRow(5); cabNotas2.forEach((h,i) => { rowCabNotas2.getCell(i+1).value = h; rowCabNotas2.getCell(i+1).style = cabeceraStyle; });
-
-                const colNF = 4 + totalEvals*colsPorEval;
-                for (let i = 0; i < alumnos.length; i++) {
-                    const row = wsNotas.getRow(i+6);
-                    row.getCell(1).value = i+1; row.getCell(2).value = alumnos[i].dni; row.getCell(3).value = alumnos[i].nombre;
-                    row.getCell(3).style = datoLeft;
-                    for (let j=0; j<totalEvals*colsPorEval; j++) row.getCell(4+j).value = '';
-                    const formulaNF = '=PROMEDIO(' + Array.from({length: totalEvals}, (_, e) => {
-                        const ini = 4 + e*colsPorEval;
-                        return `MAX(${colLetter(ini)}${i+6}:${colLetter(ini+recups)}${i+6})`;
-                    }).join(sep) + ')';
-                    row.getCell(colNF).value = { formula: formulaNF, numFmt: '0.0' }; row.getCell(colNF).style = notaFinalStyle;
-                    row.getCell(colNF+1).value = { formula: `SI(Asistencia!${colLetter(4+fechas.length)}${i+5}<${asistMin}/100${sep}"Libre por Asistencia"${sep}SI(${colLetter(colNF)}${i+6}>=${notaMin}${sep}"Aprobado"${sep}"Libre por Nota"))` };
-                    for (let c = 1; c <= colNF+1; c++) if (c !== colNF && c !== 3) row.getCell(c).style = datoStyle;
-                }
-                wsNotas.columns = [{ width: 5 }, { width: 12 }, { width: 30 }, ...Array(totalEvals*colsPorEval).fill({ width: 6 }), { width: 11 }, { width: 18 }];
-                wsNotas.views = [{ state: 'frozen', xSplit: 3, ySplit: 5 }];
-                // Merges
-                wsNotas.mergeCells(4, 1, 5, 1); wsNotas.mergeCells(4, 2, 5, 2); wsNotas.mergeCells(4, 3, 5, 3);
-                wsNotas.mergeCells(4, colNF, 5, colNF); wsNotas.mergeCells(4, colNF+1, 5, colNF+1);
-                for (let e=0; e<totalEvals; e++) wsNotas.mergeCells(4, 4+e*colsPorEval, 4, 4+(e+1)*colsPorEval-1);
-
-                // ---------- RÚBRICA ----------
+                // --- RÚBRICA ---
                 actualizarRubricaDesdeTabla();
-                const wsRub = wb.addWorksheet('Rúbrica');
-                wsRub.mergeCells(1, 1, 1, 5);
-                wsRub.getRow(1).getCell(1).value = 'MATRIZ DE EVALUACIÓN DE COMPETENCIAS'; wsRub.getRow(1).getCell(1).style = tituloStyle;
-                const cabRub = ['Criterio de Evaluación', 'Insuficiente (1-3)', 'Regular (4-6)', 'Bueno (7-8)', 'Excelente (9-10)'];
-                const rowCabRub = wsRub.getRow(3);
-                cabRub.forEach((h, i) => { rowCabRub.getCell(i+1).value = h; rowCabRub.getCell(i+1).style = subtituloStyle; });
-                rubricaCriterios.forEach((criterio, i) => {
-                    const row = wsRub.getRow(i+4);
-                    row.getCell(1).value = criterio[0]; row.getCell(1).style = { ...datoLeft, alignment: { wrapText: true, vertical: 'middle' } };
-                    for (let j = 1; j < 5; j++) { row.getCell(j+1).value = criterio[j]; row.getCell(j+1).style = { ...datoStyle, alignment: { wrapText: true, vertical: 'middle' } }; }
+                const wsR = wb.addWorksheet('Rúbrica');
+                wsR.mergeCells(1,1,1,5); wsR.getRow(1).height=35; wsR.getRow(1).getCell(1).value='MATRIZ DE EVALUACIÓN DE COMPETENCIAS'; wsR.getRow(1).getCell(1).style=titulo;
+                ['Criterio de Evaluación','Insuficiente (1-3)','Regular (4-6)','Bueno (7-8)','Excelente (9-10)'].forEach((v,i)=>wsR.getRow(3).getCell(i+1).value=v,wsR.getRow(3).style=subt);
+                rubricaCriterios.forEach((c,i)=>{
+                    const row=wsR.getRow(i+4);
+                    row.getCell(1).value=c[0]; row.getCell(1).style={...datoL,alignment:{wrapText:true,vertical:'middle'}};
+                    for(let j=1;j<5;j++) row.getCell(j+1).value=c[j],row.getCell(j+1).style={...dato,alignment:{wrapText:true,vertical:'middle'}};
                 });
-                wsRub.columns = [{ width: 35 }, { width: 20 }, { width: 20 }, { width: 25 }, { width: 25 }];
+                wsR.columns=[{width:35},{width:20},{width:20},{width:25},{width:25}];
 
-                // Descargar
                 const buffer = await wb.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g, '_')}.xlsx`;
-                a.click();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert('Error al generar el Excel: ' + error.message);
-                console.error(error);
+                a.href=url; a.download=`Seguimiento_${document.getElementById('asignatura').value.replace(/\s/g,'_')}.xlsx`;
+                a.click(); URL.revokeObjectURL(url);
+            } catch(e) {
+                alert('Error al generar el Excel: '+e.message);
+                console.error(e);
             }
         }
 
         // ==================== GUARDADO Y NAVEGACIÓN ====================
         function guardarEstado() {
-            localStorage.setItem('genAcademico_v4', JSON.stringify({
-                alumnos, fechas, rubricaCriterios,
-                asignatura: document.getElementById('asignatura').value,
-                curso: document.getElementById('curso').value,
-                docente: document.getElementById('docente').value,
-                regimen: document.getElementById('regimen').value,
-                anio: document.getElementById('anio').value,
-                notaMinima: document.getElementById('notaMinima').value,
-                asistenciaMinima: document.getElementById('asistenciaMinima').value,
-                evalsE1: document.getElementById('evalsEtapa1').value,
-                evalsE2: document.getElementById('evalsEtapa2').value,
-                recups: document.getElementById('recupsPorEval').value,
-                tpsE1: document.getElementById('tpsEtapa1').value,
-                tpsE2: document.getElementById('tpsEtapa2').value,
-                fechaInicio: document.getElementById('fechaInicio').value,
-                fechaFin: document.getElementById('fechaFin').value,
-                recesoInicio: document.getElementById('recesoInicio').value,
-                recesoFin: document.getElementById('recesoFin').value,
-                feriados: document.getElementById('feriados').value,
-                diasSeleccionados: Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => cb.value)
+            localStorage.setItem('genAcademico_v5',JSON.stringify({
+                alumnos,fechas,rubricaCriterios,
+                asignatura:document.getElementById('asignatura').value,
+                curso:document.getElementById('curso').value,
+                docente:document.getElementById('docente').value,
+                regimen:document.getElementById('regimen').value,
+                anio:document.getElementById('anio').value,
+                notaMinima:document.getElementById('notaMinima').value,
+                asistenciaMinima:document.getElementById('asistenciaMinima').value,
+                evalsE1:document.getElementById('evalsEtapa1').value,
+                evalsE2:document.getElementById('evalsEtapa2').value,
+                recups:document.getElementById('recupsPorEval').value,
+                tpsE1:document.getElementById('tpsEtapa1').value,
+                tpsE2:document.getElementById('tpsEtapa2').value,
+                fechaInicio:document.getElementById('fechaInicio').value,
+                fechaFin:document.getElementById('fechaFin').value,
+                recesoInicio:document.getElementById('recesoInicio').value,
+                recesoFin:document.getElementById('recesoFin').value,
+                feriados:document.getElementById('feriados').value,
+                diasSel:Array.from(document.querySelectorAll('#diasSemana input:checked')).map(cb=>cb.value)
             }));
         }
 
         function cargarEstado() {
-            const saved = localStorage.getItem('genAcademico_v4');
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('asignatura').value = data.asignatura || 'Asignatura1';
-                document.getElementById('curso').value = data.curso || 'Curso1 (Turno Mañana)';
-                document.getElementById('docente').value = data.docente || 'NombreProfe';
-                document.getElementById('regimen').value = data.regimen || 'Anual - Días a definir';
-                document.getElementById('anio').value = data.anio || '2026';
-                document.getElementById('notaMinima').value = data.notaMinima || 7.0;
-                document.getElementById('asistenciaMinima').value = data.asistenciaMinima || 75;
-                document.getElementById('evalsEtapa1').value = data.evalsE1 || 4;
-                document.getElementById('evalsEtapa2').value = data.evalsE2 || 4;
-                document.getElementById('recupsPorEval').value = data.recups || 2;
-                document.getElementById('tpsEtapa1').value = data.tpsE1 || 10;
-                document.getElementById('tpsEtapa2').value = data.tpsE2 || 10;
-                if (data.fechaInicio) document.getElementById('fechaInicio').value = data.fechaInicio;
-                if (data.fechaFin) document.getElementById('fechaFin').value = data.fechaFin;
-                if (data.recesoInicio) document.getElementById('recesoInicio').value = data.recesoInicio;
-                if (data.recesoFin) document.getElementById('recesoFin').value = data.recesoFin;
-                if (data.feriados) document.getElementById('feriados').value = data.feriados;
-                const checks = document.querySelectorAll('#diasSemana input[type="checkbox"]');
-                checks.forEach(cb => { cb.checked = data.diasSeleccionados ? data.diasSeleccionados.includes(cb.value) : true; });
-                if (data.alumnos) document.getElementById('listaAlumnos').value = data.alumnos.map(a => `${a.dni} ${a.nombre}`).join('\n');
-                fechas = data.fechas || [];
-                document.getElementById('fechasClase').value = fechas.join('\n');
-                document.getElementById('contadorFechas').textContent = `${fechas.length} fechas generadas`;
-                rubricaCriterios = data.rubricaCriterios || rubricaCriterios;
+            const s=localStorage.getItem('genAcademico_v5');
+            if(s){
+                const d=JSON.parse(s);
+                document.getElementById('asignatura').value=d.asignatura||'Asignatura1';
+                document.getElementById('curso').value=d.curso||'Curso1 (Turno Mañana)';
+                document.getElementById('docente').value=d.docente||'NombreProfe';
+                document.getElementById('regimen').value=d.regimen||'Anual - Días a definir';
+                document.getElementById('anio').value=d.anio||'2026';
+                document.getElementById('notaMinima').value=d.notaMinima||7.0;
+                document.getElementById('asistenciaMinima').value=d.asistenciaMinima||75;
+                document.getElementById('evalsEtapa1').value=d.evalsE1||4;
+                document.getElementById('evalsEtapa2').value=d.evalsE2||4;
+                document.getElementById('recupsPorEval').value=d.recups||2;
+                document.getElementById('tpsEtapa1').value=d.tpsE1||10;
+                document.getElementById('tpsEtapa2').value=d.tpsE2||10;
+                if(d.fechaInicio) document.getElementById('fechaInicio').value=d.fechaInicio;
+                if(d.fechaFin) document.getElementById('fechaFin').value=d.fechaFin;
+                if(d.recesoInicio) document.getElementById('recesoInicio').value=d.recesoInicio;
+                if(d.recesoFin) document.getElementById('recesoFin').value=d.recesoFin;
+                if(d.feriados) document.getElementById('feriados').value=d.feriados;
+                document.querySelectorAll('#diasSemana input').forEach(cb=>cb.checked=d.diasSel?d.diasSel.includes(cb.value):true);
+                if(d.alumnos) document.getElementById('listaAlumnos').value=d.alumnos.map(a=>`${a.dni} ${a.nombre}`).join('\n');
+                fechas=d.fechas||[];
+                document.getElementById('fechasClase').value=fechas.join('\n');
+                document.getElementById('contadorFechas').textContent=`${fechas.length} fechas`;
+                rubricaCriterios=d.rubricaCriterios||rubricaCriterios;
                 actualizarAlumnos();
                 renderizarRubrica();
-            } else {
+            }else{
                 actualizarAlumnos();
                 generarCronograma();
                 renderizarRubrica();
             }
         }
 
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-            });
-        });
-        document.getElementById('listaAlumnos').addEventListener('input', actualizarAlumnos);
-        ['asignatura','curso','docente','regimen','anio','notaMinima','asistenciaMinima',
-         'evalsEtapa1','evalsEtapa2','recupsPorEval','tpsEtapa1','tpsEtapa2'].forEach(id => {
-            document.getElementById(id).addEventListener('change', () => { guardarEstado(); renderizarPrevisualizaciones(); });
-        });
-        window.onload = cargarEstado;
+        document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
+            document.querySelectorAll('.tab-btn,.tab-content').forEach(el=>el.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+        }));
+        document.getElementById('listaAlumnos').addEventListener('input',actualizarAlumnos);
+        ['asignatura','curso','docente','regimen','anio','notaMinima','asistenciaMinima','evalsEtapa1','evalsEtapa2','recupsPorEval','tpsEtapa1','tpsEtapa2'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{guardarEstado();renderizarPrevisualizaciones();}));
+        window.onload=cargarEstado;
     </script>
 </body>
 </html>
